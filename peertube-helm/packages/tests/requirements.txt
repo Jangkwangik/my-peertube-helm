@@ -1,2 +1,0 @@
-whisper-ctranslate2
-openai-whisper

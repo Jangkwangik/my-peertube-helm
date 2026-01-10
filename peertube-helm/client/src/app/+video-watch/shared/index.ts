@@ -1,6 +1,0 @@
-export * from './action-buttons'
-export * from './comment'
-export * from './information'
-export * from './metadata'
-export * from './recommendations'
-export * from './timestamp-route-transformer.directive'

@@ -1,8 +1,0 @@
-@use '_variables' as *;
-@use '_mixins' as *;
-
-my-global-icon {
-  margin-bottom: 0.75rem;
-
-  @include global-icon-size(32px);
-}
