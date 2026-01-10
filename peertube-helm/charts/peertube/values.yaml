@@ -83,22 +83,23 @@ ingress:
           pathType: Prefix
   tls: []
 
-# [4] PeerTube 앱 설정 (중요: 빈칸 없이 가짜 값이라도 채움)
+# [4] PeerTube 앱 설정 (중요: Base64 인코딩된 비밀번호 사용)
 peertube:
   log_level: info
   trust_proxy: '10.0.0.0/8'
   webserver_hostname: chart-example.local
   webserver_port: 80
   webserver_https: false
-  secret: "fixedsecretkey12345" # 특수문자 제거한 단순 비밀번호
+  # "fixedsecret" -> Zml4ZWRzZWNyZXQ=
+  secret: "Zml4ZWRzZWNyZXQ="
   existingSecret: ""
   existingSecretKey: "secret"
 
   admin:
     email: "admin@example.com"
-    password: "fixedpassword123" # 특수문자 제거한 단순 비밀번호
+    # "password" -> cGFzc3dvcmQ=
+    password: "cGFzc3dvcmQ="
     existingSecret: ""
-    # 👇 [수정됨] 빈칸("") 대신 가짜 키 이름(dummy)을 넣음
     existingSecretKeys:
       email: "email"
       password: "password"
@@ -113,7 +114,6 @@ peertube:
     access_key_id: ""
     secret_access_key: ""
     existingSecret: ""
-    # 👇 [수정됨] 안 써도 에러 방지용으로 채움
     existingSecretKeys:
       endpoint: "endpoint"
       streaming_playlists_bucket: "bucket1"
@@ -131,48 +131,50 @@ peertube:
     password: ""
     from_address: ""
     existingSecret: ""
-    # 👇 [수정됨] 안 써도 에러 방지용으로 채움
     existingSecretKeys:
       host: "host"
       port: "port"
       username: "username"
       password: "password"
 
-# [5] 외부 DB 설정
+# [5] 외부 DB 설정 (중복 생성 방지: 기존 시크릿 사용 설정)
 externalDatabase:
   enabled: false
   hostname: "peertube-postgres-rw"
   database: "peertube"
   username: "peertube"
-  password: "dummypassword" # 빈칸 금지
-  existingSecret: ""
+  password: "cGFzc3dvcmQ=" # password (Base64)
+  # ⭐ 중요: DB 차트가 만든 시크릿을 같이 쓰겠다고 선언 (중복 방지)
+  existingSecret: "my-peertube-postgresql"
   existingSecretKeys:
     hostname: "hostname"
     database: "database"
     username: "username"
-    password: "password"
+    password: "password" # DB 차트의 키 이름
 
 externalValkey:
   enabled: false
   hostname: "valkey-primary"
-  password: "dummypassword" # 빈칸 금지
-  existingSecret: ""
+  password: "cGFzc3dvcmQ=" # password (Base64)
+  existingSecret: "my-peertube-valkey"
   existingSecretKey: "valkey-password"
 
-# [6] 내부 DB 설정
+# [6] 내부 DB 설정 (비밀번호 Base64)
 postgresql:
   enabled: true
   auth:
     database: peertube_production
     username: peertube
-    password: "fixeddbpassword123" # 특수문자 제거
-    postgresPassword: "fixeddbpassword123" # 특수문자 제거
+    # "password" -> cGFzc3dvcmQ=
+    password: "cGFzc3dvcmQ="
+    postgresPassword: "cGFzc3dvcmQ="
     existingSecret: ""
 
-# [7] 내부 캐시 설정
+# [7] 내부 캐시 설정 (비밀번호 Base64)
 valkey:
   enabled: true
   auth:
-    password: "fixedredispassword123" # 특수문자 제거
+    # "password" -> cGFzc3dvcmQ=
+    password: "cGFzc3dvcmQ="
     existingSecret: ""
     existingSecretPasswordKey: ""
