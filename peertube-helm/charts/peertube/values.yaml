@@ -1,55 +1,55 @@
 # =============================================================================
-# PeerTube 최종 배포용 values.yaml
+# PeerTube 최종 수정본 (구조 오류 해결)
 # =============================================================================
 
+# [1] 기본 인프라 설정
 replicaCount: 1
 
 image:
   registry: "docker.io"
   repository: chocobozzz/peertube
   pullPolicy: IfNotPresent
-  tag: "v6.3.3" # 안정 버전 고정
+  tag: "v6.3.3"
 
-# [1] 스토리지 설정 (EBS CSI 드라이버 사용)
+# 서비스 어카운트 설정 (에러 해결 포인트 ⭐)
+serviceAccount:
+  create: true
+  automount: true
+  name: "peertube-sa"
+
 persistence:
   enabled: true
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: "gp2" # EKS 기본 스토리지 클래스
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: "gp2"
   storage: "10Gi"
 
-# [2] 외부 접속 설정 (AWS 로드밸런서 생성)
 service:
   enabled: true
   type: LoadBalancer
   port: 80
 
-# [3] PeerTube 코어 설정
+# [2] PeerTube 코어 및 S3 설정
 peertube:
   log_level: info
   trust_proxy: '10.0.0.0/8'
-  webserver_hostname: "localhost" # 배포 후 생성되는 LoadBalancer 주소로 나중에 변경 권장
+  webserver_hostname: "localhost" # 나중에 로드밸런서 주소로 변경
   webserver_port: 80
   webserver_https: false
-  
-  # 사이트 보안 시크릿 (원하는 랜덤 문자열 입력 가능)
   secret: "peertube-secret-random-12345"
 
-  # 초기 관리자 계정 설정
   admin:
     email: "admin@example.com"
     password: "원하는_관리자_비밀번호"
 
-  # ⭐ S3 오브젝트 스토리지 연결 (가장 중요)
   s3:
     enabled: true
     endpoint: "s3.amazonaws.com"
-    region: "us-east-1" # 버지니아 북부 고정
-    bucket: "사용자님의_S3_BUCKET_NAME"
-    accessKey: ""
-    secretKey: ""
+    region: "us-east-1"
+    bucket: "사용자님의_S3_버킷명"
+    accessKey: "" # 깃허브 보안 때문에 비워두고 ArgoCD에서 입력
+    secretKey: "" # 깃허브 보안 때문에 비워두고 ArgoCD에서 입력
 
-# [4] ⭐ 외부 RDS(PostgreSQL) 연결 활성화
+# [3] 외부 RDS 연결 설정
 externalDatabase:
   enabled: true
   hostname: "사용자님의_RDS_ENDPOINT"
@@ -57,18 +57,16 @@ externalDatabase:
   username: "peertube"
   password: "사용자님의_RDS_PASSWORD"
 
-# [5] 내부 DB 및 캐시는 모두 끕니다 (이미 RDS를 사용하므로)
+# [4] 불필요한 내부 리소스 비활성화
 postgresql:
   enabled: false
 
 valkey:
-  enabled: true # 캐시는 내부용(Valkey)을 그대로 사용합니다.
-  image:
-    tag: "7.2.4-debian-11-r2"
+  enabled: true
   auth:
-    password: "peertube-redis-password"
+    password: "peertube-valkey-password"
 
-# 자원 할당량 (EKS 노드 사양에 맞춤)
+# 리소스 제한
 resources:
   limits:
     cpu: 1000m
