@@ -1,151 +1,78 @@
-nameOverride: ""
-fullnameOverride: ""
+# =============================================================================
+# PeerTube 최종 배포용 values.yaml
+# =============================================================================
+
 replicaCount: 1
 
 image:
   registry: "docker.io"
   repository: chocobozzz/peertube
   pullPolicy: IfNotPresent
-  # [1] PeerTube 안정 버전 고정
-  tag: "v6.3.3"
+  tag: "v6.3.3" # 안정 버전 고정
 
-imagePullSecrets: []
-
-containerCommand:
-  - gosu
-  - peertube
-  - npm
-  - start
-
-extraEnv: []
-envFrom: []
-initcontainers: {}
-podAnnotations: {}
-podLabels: {}
-podSecurityContext: {}
-securityContext: {}
-extraVolumes: []
-extraVolumeMounts: []
-tolerations: []
-affinity: {}
-nodeSelector: {}
-
+# [1] 스토리지 설정 (EBS CSI 드라이버 사용)
 persistence:
   enabled: true
   accessModes:
     - ReadWriteOnce
-  storageClassName: "gp2"
+  storageClassName: "gp2" # EKS 기본 스토리지 클래스
   storage: "10Gi"
-  existingClaim: ""
 
-resources:
-  limits:
-    cpu: 2000m
-    memory: 2Gi
-  requests:
-    cpu: 500m
-    memory: 1Gi
-
-livenessProbe:
-  httpGet:
-    path: /
-    port: peertube
-
-readinessProbe:
-  httpGet:
-    path: /
-    port: peertube
-
-autoscaling:
-  enabled: false
-
-serviceAccount:
-  create: true
-  automount: true
-  annotations: {}
-  name: "peertube-sa"
-
+# [2] 외부 접속 설정 (AWS 로드밸런서 생성)
 service:
   enabled: true
   type: LoadBalancer
   port: 80
 
-ingress:
-  enabled: false
-  className: "nginx"
-  annotations: {}
-  hosts:
-    - host: chart-example.local
-      paths:
-        - path: /
-          pathType: Prefix
-  tls: []
-
+# [3] PeerTube 코어 설정
 peertube:
   log_level: info
   trust_proxy: '10.0.0.0/8'
-  webserver_hostname: chart-example.local
+  webserver_hostname: "localhost" # 배포 후 생성되는 LoadBalancer 주소로 나중에 변경 권장
   webserver_port: 80
   webserver_https: false
-  # [2] 비밀번호 (Base64 형식)
-  secret: "Zml4ZWRzZWNyZXQ="
-  existingSecret: ""
-  existingSecretKey: "secret"
+  
+  # 사이트 보안 시크릿 (원하는 랜덤 문자열 입력 가능)
+  secret: "peertube-secret-random-12345"
 
+  # 초기 관리자 계정 설정
   admin:
     email: "admin@example.com"
-    password: "cGFzc3dvcmQ="
-    existingSecret: ""
-    # [3] 에러 방지용 빈 키 설정 복구
-    existingSecretKeys:
-      email: ""
-      password: ""
+    password: "원하는_관리자_비밀번호"
 
+  # ⭐ S3 오브젝트 스토리지 연결 (가장 중요)
   s3:
-    enabled: false
+    enabled: true
+    endpoint: "s3.amazonaws.com"
+    region: "us-east-1" # 버지니아 북부 고정
+    bucket: "사용자님의_S3_BUCKET_NAME"
+    accessKey: ""
+    secretKey: ""
 
-  smtp:
-    enabled: false
-
-# [4] 외부 DB 설정 (안 써도 비밀번호 필수! ⭐여기가 에러 원인이었음⭐)
+# [4] ⭐ 외부 RDS(PostgreSQL) 연결 활성화
 externalDatabase:
-  enabled: false
-  hostname: "peertube-postgres-rw"
+  enabled: true
+  hostname: "사용자님의_RDS_ENDPOINT"
   database: "peertube"
   username: "peertube"
-  password: "cGFzc3dvcmQ=" # 가짜 비번이라도 꼭 있어야 함!
-  existingSecret: ""
-  existingSecretKeys:
-    hostname: ""
-    database: ""
-    username: ""
-    password: ""
+  password: "사용자님의_RDS_PASSWORD"
 
-# [5] 외부 캐시 설정 (안 써도 비밀번호 필수!)
-externalValkey:
-  enabled: false
-  hostname: "valkey-primary"
-  password: "cGFzc3dvcmQ=" # 가짜 비번이라도 꼭 있어야 함!
-  existingSecret: ""
-  existingSecretKey: "valkey-password"
-
-# [6] 내부 DB 설정 (이미지 버전 고정 & 비밀번호)
+# [5] 내부 DB 및 캐시는 모두 끕니다 (이미 RDS를 사용하므로)
 postgresql:
-  enabled: true
-  image:
-    tag: "16.1.0-debian-11-r8"
-  auth:
-    database: peertube_production
-    username: peertube
-    password: "cGFzc3dvcmQ="
-    postgresPassword: "cGFzc3dvcmQ="
-    existingSecret: ""
+  enabled: false
 
-# [7] 내부 캐시 설정 (이미지 버전 고정 & 비밀번호)
 valkey:
-  enabled: true
+  enabled: true # 캐시는 내부용(Valkey)을 그대로 사용합니다.
   image:
     tag: "7.2.4-debian-11-r2"
   auth:
-    password: "cGFzc3dvcmQ="
-    existingSecret: ""
+    password: "peertube-redis-password"
+
+# 자원 할당량 (EKS 노드 사양에 맞춤)
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi

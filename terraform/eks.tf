@@ -23,6 +23,38 @@ resource "aws_iam_role_policy_attachment" "cluster_policy" {
   role       = aws_iam_role.cluster_role.name
 }
 
+# 1. EBS CSI 드라이버가 사용할 IAM 역할 생성
+resource "aws_iam_role" "ebs_csi_role" {
+  name = "peertube-ebs-csi-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Effect = "Allow"
+        Principal = {
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${replace(aws_eks_cluster.this.identity[0].oidc[0].issuer, "https://", "")}"
+        }
+        Condition = {
+          StringEquals = {
+            "${replace(aws_eks_cluster.this.identity[0].oidc[0].issuer, "https://", "")}:sub" = "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+          }
+        }
+      }
+    ]
+  })
+}
+
+# 2. 역할에 EBS 관리 권한 부여
+resource "aws_iam_role_policy_attachment" "ebs_csi_policy_attach" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+  role       = aws_iam_role.ebs_csi_role.name
+}
+
+# 3. 계정 ID 조회를 위한 데이터 소스 (파일 맨 위에 있어도 됨)
+data "aws_caller_identity" "current" {}
+
 # -----------------------------------------------------------------------------
 # [Node Role] 워커 노드(EC2)들이 사용할 통합 역할 ⭐ (여기가 핵심!)
 # -----------------------------------------------------------------------------
@@ -87,7 +119,7 @@ resource "aws_security_group" "cluster_sg" {
 # =============================================================================
 resource "aws_eks_cluster" "this" {
   name     = "peertube-cluster"
-  version  = "1.31" # 안정적인 버전 사용
+  version  = "1.34" # 안정적인 버전 사용
   role_arn = aws_iam_role.cluster_role.arn
 
   vpc_config {
@@ -209,20 +241,15 @@ resource "aws_eks_addon" "coredns" {
 }
 
 resource "aws_eks_addon" "ebs_csi" {
-  cluster_name                = aws_eks_cluster.this.name
-  addon_name                  = "aws-ebs-csi-driver"
-  resolve_conflicts_on_create = "OVERWRITE"
+  cluster_name             = aws_eks_cluster.this.name
+  addon_name               = "aws-ebs-csi-driver"
+  
+  # 👇 이 줄을 추가하여 새로 만든 역할을 연결합니다!
+  service_account_role_arn = aws_iam_role.ebs_csi_role.arn
 
-  # ⭐ 노드가 먼저 생성되어야 드라이버가 설치됨
   depends_on = [
     aws_eks_node_group.app,
     aws_eks_node_group.monitoring,
     aws_eks_node_group.argocd
   ]
-}
-
-resource "aws_eks_addon" "metrics_server" {
-  cluster_name                = aws_eks_cluster.this.name
-  addon_name                  = "metrics-server"
-  resolve_conflicts_on_create = "OVERWRITE"
 }
