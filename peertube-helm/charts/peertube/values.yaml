@@ -1,7 +1,3 @@
-# =============================================================================
-# PeerTube Helm - Final Corrected values.yaml
-# =============================================================================
-
 replicaCount: 1
 
 image:
@@ -14,12 +10,14 @@ serviceAccount:
   create: true
   automount: true
   name: "peertube-sa"
+  annotations: {}
 
 persistence:
   enabled: true
   accessModes: ["ReadWriteOnce"]
   storageClassName: "gp2"
   storage: "10Gi"
+  existingClaim: ""
 
 service:
   enabled: true
@@ -33,20 +31,36 @@ peertube:
   webserver_port: 80
   webserver_https: false
   secret: "peertube-secret-random-12345"
+  existingSecret: ""
+  existingSecretKey: "secret"
 
   admin:
     email: "admin@example.com"
     password: "원하는_관리자_비밀번호"
+    existingSecret: ""
+    existingSecretKeys:
+      email: ""
+      password: ""
 
   s3:
     enabled: true
     endpoint: "s3.amazonaws.com"
     region: "us-east-1"
     bucket: "사용자님의_S3_버킷명"
-    accessKey: "" # ArgoCD에서 입력하거나 --set으로 전달됨
-    secretKey: "" # ArgoCD에서 입력하거나 --set으로 전달됨
+    accessKey: ""
+    secretKey: ""
 
-# [에러 해결 포인트 1] 외부 DB 설정 - 하위 구조 전체 포함
+  smtp:
+    enabled: false
+    hostname: ""
+    port: 25
+    username: ""
+    password: ""
+    from_address: ""
+    tls: false
+    existingSecret: ""
+    existingSecretKey: ""
+
 externalDatabase:
   enabled: true
   hostname: "사용자님의_RDS_ENDPOINT"
@@ -60,7 +74,6 @@ externalDatabase:
     username: ""
     password: ""
 
-# [에러 해결 포인트 2] 외부 Valkey 설정 - 하위 구조 전체 포함 ⭐
 externalValkey:
   enabled: false
   hostname: ""
@@ -71,11 +84,11 @@ externalValkey:
 postgresql:
   enabled: false
 
-# 내부 캐시 사용
 valkey:
   enabled: true
   auth:
     password: "peertube-valkey-password"
+    existingSecret: ""
 
 resources:
   limits:
