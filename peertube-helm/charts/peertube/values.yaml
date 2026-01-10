@@ -29,7 +29,7 @@ tolerations: []
 affinity: {}
 nodeSelector: {}
 
-# [1] 저장소 설정 (필수)
+# [1] 저장소 설정
 persistence:
   enabled: true
   accessModes:
@@ -62,6 +62,7 @@ autoscaling:
 serviceAccount:
   create: true
   automount: true
+  annotations: {}
   name: "peertube-sa"
 
 # [2] 서비스 로드밸런서 설정
@@ -74,57 +75,102 @@ service:
 ingress:
   enabled: false
   className: "nginx"
+  annotations: {}
   hosts:
     - host: chart-example.local
       paths:
         - path: /
           pathType: Prefix
+  tls: []
 
-# [4] PeerTube 앱 설정 (비밀번호 채움)
+# [4] PeerTube 앱 설정 (여기가 중요! ⭐)
 peertube:
   log_level: info
   trust_proxy: '10.0.0.0/8'
   webserver_hostname: chart-example.local
   webserver_port: 80
   webserver_https: false
-  secret: "peertube_secret_key_12345" # 값 필수
+  secret: "peertube_secret_key_12345"
   existingSecret: ""
   existingSecretKey: "secret"
 
   admin:
     email: "admin@example.com"
-    password: "adminpassword123!"     # 값 필수
+    password: "adminpassword123!"
+    existingSecret: ""
+    # 👇 [복구됨] 이 부분이 없어서 에러가 났습니다!
+    existingSecretKeys:
+      email: ""
+      password: ""
 
   s3:
     enabled: false
+    endpoint: ""
+    streaming_playlists_bucket: ""
+    web_videos_bucket: ""
+    user_exports_bucket: ""
+    original_video_files_bucket: ""
+    access_key_id: ""
+    secret_access_key: ""
+    existingSecret: ""
+    existingSecretKeys:
+      endpoint: ""
+      streaming_playlists_bucket: ""
+      web_videos_bucket: ""
+      user_exports_bucket: ""
+      original_video_files_bucket: ""
+      access_key_id: ""
+      secret_access_key: ""
 
   smtp:
     enabled: false
+    host: ""
+    port: ""
+    user: ""
+    password: ""
+    from_address: ""
+    existingSecret: ""
+    existingSecretKeys:
+      host: ""
+      port: ""
+      username: ""
+      password: ""
 
-# [5] 외부 DB 설정 (안 써도 비밀번호는 채워야 함 - 에러 원인 추정)
+# [5] 외부 DB 설정
 externalDatabase:
   enabled: false
   hostname: "peertube-postgres-rw"
   database: "peertube"
   username: "peertube"
-  password: "dummy_password_fix"      # ⭐ 여기에 값이 없어서 에러났을 확률 높음!
+  password: "dummy_password_fix"
+  existingSecret: ""
+  existingSecretKeys:
+    hostname: ""
+    database: ""
+    username: ""
+    password: ""
 
 externalValkey:
   enabled: false
   hostname: "valkey-primary"
   password: "dummy_password_fix"
+  existingSecret: ""
+  existingSecretKey: valkey-password
 
-# [6] 내부 DB 설정 (값 필수)
+# [6] 내부 DB 설정
 postgresql:
   enabled: true
   auth:
     database: peertube_production
     username: peertube
-    password: "dbpassword123!"         # 값 필수
-    postgresPassword: "dbpassword123!" # 값 필수
+    password: "dbpassword123!"
+    postgresPassword: "dbpassword123!"
+    existingSecret: ""
 
-# [7] 내부 캐시 설정 (값 필수)
+# [7] 내부 캐시 설정
 valkey:
   enabled: true
   auth:
-    password: "redispassword123!"      # 값 필수
+    password: "redispassword123!"
+    existingSecret: ""
+    existingSecretPasswordKey: ""
