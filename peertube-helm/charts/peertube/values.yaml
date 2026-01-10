@@ -1,8 +1,7 @@
 # =============================================================================
-# PeerTube 최종 수정본 (구조 오류 해결)
+# PeerTube Helm - Final Corrected values.yaml
 # =============================================================================
 
-# [1] 기본 인프라 설정
 replicaCount: 1
 
 image:
@@ -11,7 +10,6 @@ image:
   pullPolicy: IfNotPresent
   tag: "v6.3.3"
 
-# 서비스 어카운트 설정 (에러 해결 포인트 ⭐)
 serviceAccount:
   create: true
   automount: true
@@ -28,11 +26,10 @@ service:
   type: LoadBalancer
   port: 80
 
-# [2] PeerTube 코어 및 S3 설정
 peertube:
   log_level: info
   trust_proxy: '10.0.0.0/8'
-  webserver_hostname: "localhost" # 나중에 로드밸런서 주소로 변경
+  webserver_hostname: "localhost"
   webserver_port: 80
   webserver_https: false
   secret: "peertube-secret-random-12345"
@@ -46,27 +43,40 @@ peertube:
     endpoint: "s3.amazonaws.com"
     region: "us-east-1"
     bucket: "사용자님의_S3_버킷명"
-    accessKey: "" # 깃허브 보안 때문에 비워두고 ArgoCD에서 입력
-    secretKey: "" # 깃허브 보안 때문에 비워두고 ArgoCD에서 입력
+    accessKey: "" # ArgoCD에서 입력하거나 --set으로 전달됨
+    secretKey: "" # ArgoCD에서 입력하거나 --set으로 전달됨
 
-# [3] 외부 RDS 연결 설정
+# [에러 해결 포인트 1] 외부 DB 설정 - 하위 구조 전체 포함
 externalDatabase:
   enabled: true
   hostname: "사용자님의_RDS_ENDPOINT"
   database: "peertube"
   username: "peertube"
   password: "사용자님의_RDS_PASSWORD"
+  existingSecret: ""
+  existingSecretKeys:
+    hostname: ""
+    database: ""
+    username: ""
+    password: ""
 
-# [4] 불필요한 내부 리소스 비활성화
+# [에러 해결 포인트 2] 외부 Valkey 설정 - 하위 구조 전체 포함 ⭐
+externalValkey:
+  enabled: false
+  hostname: ""
+  password: ""
+  existingSecret: ""
+  existingSecretKey: ""
+
 postgresql:
   enabled: false
 
+# 내부 캐시 사용
 valkey:
   enabled: true
   auth:
     password: "peertube-valkey-password"
 
-# 리소스 제한
 resources:
   limits:
     cpu: 1000m
