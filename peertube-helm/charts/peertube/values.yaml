@@ -83,25 +83,25 @@ ingress:
           pathType: Prefix
   tls: []
 
-# [4] PeerTube 앱 설정 (여기가 중요! ⭐)
+# [4] PeerTube 앱 설정 (중요: 빈칸 없이 가짜 값이라도 채움)
 peertube:
   log_level: info
   trust_proxy: '10.0.0.0/8'
   webserver_hostname: chart-example.local
   webserver_port: 80
   webserver_https: false
-  secret: "peertube_secret_key_12345"
+  secret: "fixedsecretkey12345" # 특수문자 제거한 단순 비밀번호
   existingSecret: ""
   existingSecretKey: "secret"
 
   admin:
     email: "admin@example.com"
-    password: "adminpassword123!"
+    password: "fixedpassword123" # 특수문자 제거한 단순 비밀번호
     existingSecret: ""
-    # 👇 [복구됨] 이 부분이 없어서 에러가 났습니다!
+    # 👇 [수정됨] 빈칸("") 대신 가짜 키 이름(dummy)을 넣음
     existingSecretKeys:
-      email: ""
-      password: ""
+      email: "email"
+      password: "password"
 
   s3:
     enabled: false
@@ -113,14 +113,15 @@ peertube:
     access_key_id: ""
     secret_access_key: ""
     existingSecret: ""
+    # 👇 [수정됨] 안 써도 에러 방지용으로 채움
     existingSecretKeys:
-      endpoint: ""
-      streaming_playlists_bucket: ""
-      web_videos_bucket: ""
-      user_exports_bucket: ""
-      original_video_files_bucket: ""
-      access_key_id: ""
-      secret_access_key: ""
+      endpoint: "endpoint"
+      streaming_playlists_bucket: "bucket1"
+      web_videos_bucket: "bucket2"
+      user_exports_bucket: "bucket3"
+      original_video_files_bucket: "bucket4"
+      access_key_id: "accesskey"
+      secret_access_key: "secretkey"
 
   smtp:
     enabled: false
@@ -130,11 +131,12 @@ peertube:
     password: ""
     from_address: ""
     existingSecret: ""
+    # 👇 [수정됨] 안 써도 에러 방지용으로 채움
     existingSecretKeys:
-      host: ""
-      port: ""
-      username: ""
-      password: ""
+      host: "host"
+      port: "port"
+      username: "username"
+      password: "password"
 
 # [5] 외부 DB 설정
 externalDatabase:
@@ -142,20 +144,20 @@ externalDatabase:
   hostname: "peertube-postgres-rw"
   database: "peertube"
   username: "peertube"
-  password: "dummy_password_fix"
+  password: "dummypassword" # 빈칸 금지
   existingSecret: ""
   existingSecretKeys:
-    hostname: ""
-    database: ""
-    username: ""
-    password: ""
+    hostname: "hostname"
+    database: "database"
+    username: "username"
+    password: "password"
 
 externalValkey:
   enabled: false
   hostname: "valkey-primary"
-  password: "dummy_password_fix"
+  password: "dummypassword" # 빈칸 금지
   existingSecret: ""
-  existingSecretKey: valkey-password
+  existingSecretKey: "valkey-password"
 
 # [6] 내부 DB 설정
 postgresql:
@@ -163,14 +165,14 @@ postgresql:
   auth:
     database: peertube_production
     username: peertube
-    password: "dbpassword123!"
-    postgresPassword: "dbpassword123!"
+    password: "fixeddbpassword123" # 특수문자 제거
+    postgresPassword: "fixeddbpassword123" # 특수문자 제거
     existingSecret: ""
 
 # [7] 내부 캐시 설정
 valkey:
   enabled: true
   auth:
-    password: "redispassword123!"
+    password: "fixedredispassword123" # 특수문자 제거
     existingSecret: ""
     existingSecretPasswordKey: ""
