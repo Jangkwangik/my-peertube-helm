@@ -1,3 +1,7 @@
+# =============================================================================
+# PeerTube Helm - Full Structural Framework (Final)
+# =============================================================================
+
 replicaCount: 1
 
 image:
@@ -5,6 +9,18 @@ image:
   repository: chocobozzz/peertube
   pullPolicy: IfNotPresent
   tag: "v6.3.3"
+
+# [에러 해결] Ingress 구조 추가
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations: {}
+  hosts:
+    - host: localhost
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
 
 serviceAccount:
   create: true
@@ -97,3 +113,7 @@ resources:
   requests:
     cpu: 500m
     memory: 512Mi
+
+# 마지막으로 혹시 모를 헬스체크 구조 추가
+autoscaling:
+  enabled: false
