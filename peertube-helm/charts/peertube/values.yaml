@@ -6,7 +6,7 @@ image:
   registry: "docker.io"
   repository: chocobozzz/peertube
   pullPolicy: IfNotPresent
-  tag: ""
+  tag: "v6.3.3" # PeerTube 안정 버전 명시
 
 imagePullSecrets: []
 
@@ -83,98 +83,56 @@ ingress:
           pathType: Prefix
   tls: []
 
-# [4] PeerTube 앱 설정 (중요: Base64 인코딩된 비밀번호 사용)
+# [4] PeerTube 앱 설정 (비밀번호 Base64 & 단순화)
 peertube:
   log_level: info
   trust_proxy: '10.0.0.0/8'
   webserver_hostname: chart-example.local
   webserver_port: 80
   webserver_https: false
-  # "fixedsecret" -> Zml4ZWRzZWNyZXQ=
-  secret: "Zml4ZWRzZWNyZXQ="
+  secret: "Zml4ZWRzZWNyZXQ=" # fixedsecret (Base64)
   existingSecret: ""
   existingSecretKey: "secret"
 
   admin:
     email: "admin@example.com"
-    # "password" -> cGFzc3dvcmQ=
-    password: "cGFzc3dvcmQ="
+    password: "cGFzc3dvcmQ=" # password (Base64)
     existingSecret: ""
-    existingSecretKeys:
-      email: "email"
-      password: "password"
+    # 👇 [수정됨] 에러 원인이던 Keys 설정 제거 (차트 기본값 사용)
 
   s3:
     enabled: false
-    endpoint: ""
-    streaming_playlists_bucket: ""
-    web_videos_bucket: ""
-    user_exports_bucket: ""
-    original_video_files_bucket: ""
-    access_key_id: ""
-    secret_access_key: ""
-    existingSecret: ""
-    existingSecretKeys:
-      endpoint: "endpoint"
-      streaming_playlists_bucket: "bucket1"
-      web_videos_bucket: "bucket2"
-      user_exports_bucket: "bucket3"
-      original_video_files_bucket: "bucket4"
-      access_key_id: "accesskey"
-      secret_access_key: "secretkey"
 
   smtp:
     enabled: false
-    host: ""
-    port: ""
-    user: ""
-    password: ""
-    from_address: ""
-    existingSecret: ""
-    existingSecretKeys:
-      host: "host"
-      port: "port"
-      username: "username"
-      password: "password"
 
-# [5] 외부 DB 설정 (중복 생성 방지: 기존 시크릿 사용 설정)
+# [5] 외부 DB 사용 안 함
 externalDatabase:
   enabled: false
-  hostname: "peertube-postgres-rw"
-  database: "peertube"
-  username: "peertube"
-  password: "cGFzc3dvcmQ=" # password (Base64)
-  # ⭐ 중요: DB 차트가 만든 시크릿을 같이 쓰겠다고 선언 (중복 방지)
-  existingSecret: "my-peertube-postgresql"
-  existingSecretKeys:
-    hostname: "hostname"
-    database: "database"
-    username: "username"
-    password: "password" # DB 차트의 키 이름
 
 externalValkey:
   enabled: false
-  hostname: "valkey-primary"
-  password: "cGFzc3dvcmQ=" # password (Base64)
-  existingSecret: "my-peertube-valkey"
-  existingSecretKey: "valkey-password"
 
-# [6] 내부 DB 설정 (비밀번호 Base64)
+# [6] 내부 DB 설정 (이미지 버전 강제 고정 & 비밀번호)
 postgresql:
   enabled: true
+  # 👇 [중요] 존재하지 않는 17.x 버전 대신 안정적인 16.x 버전 사용
+  image:
+    tag: "16.1.0-debian-11-r8"
   auth:
     database: peertube_production
     username: peertube
-    # "password" -> cGFzc3dvcmQ=
     password: "cGFzc3dvcmQ="
     postgresPassword: "cGFzc3dvcmQ="
     existingSecret: ""
 
-# [7] 내부 캐시 설정 (비밀번호 Base64)
+# [7] 내부 캐시 설정 (이미지 버전 강제 고정 & 비밀번호)
 valkey:
   enabled: true
+  # 👇 [중요] 존재하지 않는 8.x 대신 호환되는 Redis 이미지 사용 고려했으나
+  # Valkey 안정 버전 태그 지정
+  image:
+    tag: "7.2.4-debian-11-r2"
   auth:
-    # "password" -> cGFzc3dvcmQ=
     password: "cGFzc3dvcmQ="
     existingSecret: ""
-    existingSecretPasswordKey: ""
