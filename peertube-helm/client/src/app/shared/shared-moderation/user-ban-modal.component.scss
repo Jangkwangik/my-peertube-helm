@@ -1,0 +1,11 @@
+@use '_variables' as *;
+@use '_mixins' as *;
+@use '_form-mixins' as *;
+
+.description {
+  margin-bottom: 15px;
+}
+
+textarea {
+  @include peertube-textarea(100%, 60px);
+}

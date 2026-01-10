@@ -1,0 +1,229 @@
+@use "sass:math";
+@use "sass:color";
+@use "_variables" as *;
+@use "_bootstrap-variables" as *;
+@use "_mixins" as *;
+@use "_icons" as *;
+@use "_fonts";
+@use "./custom-markup";
+@use "./bootstrap";
+@use "./z-index";
+@use "./class-helpers/index.scss";
+@use "_css-variables" as *;
+@use "./primeng";
+
+@mixin main-col-expanded {
+  --menu-width: #{$menu-collapsed-width};
+}
+
+/* clears the ‘X’ from Chrome */
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  display: none;
+}
+
+// ---------------------------------------------------------------------------
+
+:root {
+  @include define-css-variables();
+}
+
+body {
+  font-family: $main-fonts;
+  font-weight: $font-regular;
+  color: pvar(--fg);
+  background-color: pvar(--bg);
+
+  // On desktop browsers, make sure vertical scroll bar is always visible
+  // Allow to disable the scrollbar instead of hide it when the content fit the body
+  // And not move the content and header horizontally sticked to right when the content is updating
+  overflow-y: scroll;
+
+  // Fix "reboot" style that set text-align: left
+  text-align: start;
+}
+
+::selection {
+  color: pvar(--on-primary-450);
+  background-color: pvar(--primary-450);
+}
+
+// Force to override bootstrap utilities
+body [hidden] {
+  display: none !important;
+}
+
+noscript,
+#incompatible-browser {
+  display: block;
+  font-size: 1.2rem;
+  max-width: 600px;
+  margin: 1rem auto;
+}
+
+strong {
+  font-weight: $font-bold;
+}
+
+input[readonly] {
+  // Force blank on readonly inputs
+  background-color: pvar(--input-bg);
+}
+
+input,
+textarea {
+  color: pvar(--input-fg);
+
+  @include disable-outline;
+}
+
+button {
+  background: unset;
+  color: pvar(--fg);
+
+  @include disable-outline;
+}
+
+.pt-label-container {
+  margin-bottom: 0.5rem;
+
+  label {
+    display: inline;
+
+    @include margin-right(0.25rem);
+  }
+}
+
+code {
+  background-color: pvar(--bg-secondary-500);
+  color: pvar(--fg-400);
+  border-radius: 3px;
+  padding: 0.2em 0.4em;
+  margin: auto 0.4em;
+  font-size: 75%;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+a {
+  color: inherit;
+}
+
+my-link:hover,
+a:hover {
+  opacity: 0.8;
+}
+
+a.dropdown-item,
+a.action-button {
+  &:hover {
+    opacity: 1;
+  }
+}
+
+a.pt {
+  text-decoration-color: pvar(--border-primary);
+  text-underline-offset: 0.25em;
+}
+
+.main-col {
+  // Don't use rfs to get exact pixels
+  width: calc(100% - #{pvar(--menu-width)});
+  margin-inline-start: pvar(--menu-width);
+  outline: none;
+
+  .margin-content {
+    margin: 0 pvar(--x-margin-content);
+    flex-grow: 1;
+  }
+
+  .skip-to-content-sub-menu {
+    display: block;
+    z-index: z(modal);
+    padding: 1rem;
+    background: pvar(--bg);
+    text-align: center;
+    text-decoration: underline;
+  }
+
+  // Override some properties if the main content is expanded (no menu on the left)
+  &.expanded {
+    @include main-col-expanded();
+  }
+
+  &.lock-scroll .main-row > router-outlet + * {
+    /* stylelint-disable-line selector-max-compound-selectors */
+    // Lock and hide body scrollbars
+    position: fixed;
+  }
+}
+
+.modal-open {
+  overflow: hidden !important;
+}
+
+my-global-icon[iconName="external-link"] {
+  margin: 0 0.3em;
+  width: 0.9em;
+  height: 0.9em;
+  line-height: 0.9em;
+  display: inline-block;
+  color: pvar(--secondary-icon-color);
+  position: relative;
+  top: -0.1em;
+}
+
+@media screen and (max-width: $menu-overlay-view) {
+  .menu-open {
+    overflow: hidden !important;
+  }
+
+  .main-col {
+    @include main-col-expanded();
+  }
+}
+
+@media screen and (max-width: $small-view) {
+  .main-col {
+    --x-margin-content: 1rem;
+  }
+
+  my-markdown-textarea {
+    .root {
+      max-width: 100% !important;
+    }
+  }
+
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  textarea,
+  .peertube-select-container {
+    flex-grow: 1;
+  }
+
+  .caption input[type="text"] {
+    width: unset !important;
+    flex-grow: 1;
+  }
+}
+
+@media screen and (max-width: $mobile-view) {
+  .main-col,
+  .main-col.expanded {
+    width: 100%;
+
+    @include margin-left(0);
+  }
+}
+
+ngx-loading-bar {
+  .ngx-bar {
+    height: 3px !important;
+    border-radius: 0 !important;
+    border-start-end-radius: 6px !important;
+    border-end-end-radius: 6px !important;
+  }
+}

@@ -1,0 +1,349 @@
+@use "sass:math";
+@use "sass:color";
+@use "_variables" as *;
+@import "_bootstrap-mixins";
+
+@mixin underline-primary {
+  text-decoration: underline !important;
+  text-decoration-color: pvar(--border-primary) !important;
+  text-underline-offset: 0.25em !important;
+  text-decoration-thickness: 0.15em !important;
+}
+
+@mixin section-label {
+  color: pvar(--fg-300);
+  font-size: 14px;
+  margin-bottom: 15px;
+  font-weight: $font-bold;
+  letter-spacing: 1px;
+
+  @media screen and (max-width: $mobile-view) {
+    font-size: 12px;
+    margin-bottom: 5px;
+  }
+}
+
+@mixin disable-default-a-behaviour {
+  &,
+  &:hover,
+  &:focus,
+  &:active {
+    text-decoration: none;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+@mixin disable-outline {
+  &:focus:not(:focus-visible) {
+    outline: none !important;
+  }
+}
+
+@mixin ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@mixin muted-1 {
+  color: pvar(--fg-300) !important;
+}
+
+@mixin muted-2 {
+  color: pvar(--fg-200) !important;
+
+  a,
+  .fake-link {
+    color: pvar(--fg);
+    text-decoration: underline;
+  }
+}
+
+@mixin fade-text($fade-after, $background-color) {
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: "";
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: linear-gradient(transparent $fade-after, $background-color);
+  }
+}
+
+@mixin peertube-word-wrap($with-hyphen: true) {
+  word-break: break-word;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+
+  @if $with-hyphen {
+    hyphens: auto;
+  }
+}
+
+@mixin apply-svg-color($color) {
+  ::ng-deep .feather,
+  ::ng-deep .material,
+  ::ng-deep .misc {
+    color: $color;
+  }
+}
+
+@mixin fill-path-svg-color($color) {
+  ::ng-deep svg {
+    path {
+      fill: $color;
+    }
+  }
+}
+
+@mixin fill-svg-color($color) {
+  ::ng-deep svg {
+    fill: $color;
+  }
+}
+
+@mixin rounded-line-height-1-5($font-size) {
+  line-height: calc(#{$font-size} + #{math.round(math.div($font-size, 2))});
+}
+
+@mixin icon($size) {
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-size: contain;
+  width: $size;
+  height: $size;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+@mixin global-icon-size($size) {
+  display: inline-block;
+  width: $size;
+  height: $size;
+  line-height: $size;
+}
+
+@mixin responsive-width($width) {
+  width: $width;
+
+  @media screen and (max-width: #{$width + 30px}) {
+    width: 100%;
+  }
+}
+
+@mixin actor-counters($separator-margin: 10px) {
+  color: pvar(--fg-300);
+  display: flex;
+  align-items: center;
+
+  > *:not(:last-child)::after {
+    content: "•";
+    margin: 0 $separator-margin;
+    color: pvar(--primary);
+  }
+}
+
+@mixin row-blocks($column-responsive: true, $min-height: 130px, $separator: true) {
+  display: flex;
+  min-height: $min-height;
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.25rem;
+
+  @if $separator {
+    border-bottom: 1px solid pvar(--input-border-color);
+  }
+
+  @media screen and (max-width: $small-view) {
+    @if $column-responsive {
+      flex-direction: column;
+      height: auto;
+      align-items: center;
+    } @else {
+      min-height: initial;
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+  }
+}
+
+@mixin dropdown-with-icon-item {
+  padding: pvar(--input-y-padding) 1rem;
+
+  my-global-icon {
+    width: 22px;
+    opacity: 0.7;
+    position: relative;
+    top: -2px;
+
+    @include margin-right($dropdown-icon-margin-right);
+  }
+
+  my-actor-avatar {
+    @include margin-right($dropdown-icon-margin-right);
+  }
+}
+
+@mixin divider($color: pvar(--bg-secondary-400), $background: pvar(--bg)) {
+  width: 95%;
+  border-top: 0.05rem solid $color;
+  height: 0.05rem;
+  text-align: center;
+  display: block;
+  position: relative;
+
+  &[data-content] {
+    margin: 0.8rem 0;
+
+    &::after {
+      background: $background;
+      color: $color;
+      content: attr(data-content);
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 0 0.4rem;
+      transform: translateY(-0.65rem);
+    }
+  }
+}
+
+// applies ratio (default to 16:9) to a child element (using $selector) only using
+// an immediate's parent size. This allows to set a ratio without explicit
+// dimensions, as width/height cannot be computed from each other.
+@mixin block-ratio($selector: "div", $inverted-ratio: math.div(9, 16)) {
+  $padding-percent: math.percentage($inverted-ratio);
+
+  position: relative;
+  height: 0;
+  width: 100%;
+  padding-top: $padding-percent;
+
+  #{$selector} {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+
+    @content;
+  }
+}
+
+@mixin play-icon($width, $height) {
+  width: 0;
+  height: 0;
+
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.5);
+
+  border-top: #{math.div($height, 2)} solid transparent;
+  border-bottom: #{math.div($height, 2)} solid transparent;
+
+  border-left: $width solid #F4F4F5;
+}
+
+@mixin on-small-main-col() {
+  @media screen and (max-width: $small-view) {
+    @content;
+  }
+}
+
+@mixin on-mobile-main-col() {
+  @media screen and (max-width: $mobile-view) {
+    @content;
+  }
+}
+
+// ---------------------------------------------------------------------------
+
+@mixin margin($arg1: null, $arg2: null, $arg3: null, $arg4: null) {
+  @if $arg2 == null and $arg3 == null and $arg4 == null {
+    @include margin-original($arg1, $arg1, $arg1, $arg1);
+  } @else if $arg3 == null and $arg4 == null {
+    @include margin-original($arg1, $arg2, $arg1, $arg2);
+  } @else if $arg4 == null {
+    @include margin-original($arg1, $arg2, $arg3, $arg2);
+  } @else {
+    @include margin-original($arg1, $arg2, $arg3, $arg4);
+  }
+}
+
+@mixin margin-original($block-start, $inline-end, $block-end, $inline-start) {
+  @include margin-left($inline-start);
+  @include margin-right($inline-end);
+  @include margin-top($block-start);
+  @include margin-bottom($block-end);
+}
+
+@mixin margin-left($value) {
+  @include rfs($value, margin-inline-start);
+}
+
+@mixin margin-right($value) {
+  @include rfs($value, margin-inline-end);
+}
+
+// ---------------------------------------------------------------------------
+
+@mixin padding-original($block-start, $inline-end, $block-end, $inline-start) {
+  @include padding-left($inline-start);
+  @include padding-right($inline-end);
+  @include padding-top($block-start);
+  @include padding-bottom($block-end);
+}
+
+@mixin padding($arg1: null, $arg2: null, $arg3: null, $arg4: null) {
+  @if $arg2 == null and $arg3 == null and $arg4 == null {
+    @include padding-original($arg1, $arg1, $arg1, $arg1);
+  } @else if $arg3 == null and $arg4 == null {
+    @include padding-original($arg1, $arg2, $arg1, $arg2);
+  } @else if $arg4 == null {
+    @include padding-original($arg1, $arg2, $arg3, $arg2);
+  } @else {
+    @include padding-original($arg1, $arg2, $arg3, $arg4);
+  }
+}
+
+@mixin padding-left($value) {
+  @include rfs($value, padding-inline-start);
+}
+
+@mixin padding-right($value) {
+  @include rfs($value, padding-inline-end);
+}
+
+// ---------------------------------------------------------------------------
+
+/**
+ *
+ * inset-inline properties are not supported by iOS < 14.5
+ *
+ */
+
+@mixin right($value) {
+  @supports (inset-inline-end: $value) {
+    inset-inline-end: $value;
+  }
+
+  @supports not (inset-inline-end: $value) {
+    right: $value;
+  }
+}
+
+@mixin left($value) {
+  @supports (inset-inline-start: $value) {
+    inset-inline-start: $value;
+  }
+
+  @supports not (inset-inline-start: $value) {
+    left: $value;
+  }
+}

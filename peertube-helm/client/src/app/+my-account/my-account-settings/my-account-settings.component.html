@@ -1,0 +1,113 @@
+<h1 class="visually-hidden" i18n>Settings</h1>
+
+<div class="pt-two-cols mt-3"> <!-- profile settings grid -->
+  <div class="title-col">
+    <h2 i18n>PROFILE SETTINGS</h2>
+  </div>
+
+  <div class="content-col">
+    @if (user?.account) {
+      <my-actor-avatar-edit
+        class="d-block mb-3"
+        actorType="account" [avatars]="user.account.avatars"
+        [displayName]="user.account.displayName" [username]="user.username" [subscribers]="user.account.followersCount"
+        (avatarChange)="onAvatarChange($event)" (avatarDelete)="onAvatarDelete()"
+      ></my-actor-avatar-edit>
+    }
+
+    <my-user-quota></my-user-quota>
+
+    <my-account-profile [user]="user"></my-account-profile>
+  </div>
+</div>
+
+<div class="pt-two-cols mt-5"> <!-- interface grid -->
+  <div class="title-col">
+    <div class="anchor" id="interface-settings"></div> <!-- interface settings anchor -->
+    <h2 i18n>INTERFACE</h2>
+  </div>
+
+  <div class="content-col">
+    <my-user-interface-settings [user]="user" [userInformationLoaded]="userInformationLoaded"></my-user-interface-settings>
+  </div>
+</div>
+
+<div class="pt-two-cols mt-5"> <!-- video settings grid -->
+  <div class="title-col">
+    <div class="anchor" id="video-settings"></div> <!-- video settings anchor -->
+    <h2 i18n>VIDEO SETTINGS</h2>
+  </div>
+
+  <div class="content-col">
+    <my-user-video-settings [user]="user" [userInformationLoaded]="userInformationLoaded"></my-user-video-settings>
+  </div>
+</div>
+
+<div class="pt-two-cols mt-5"> <!-- notifications grid -->
+  <div class="title-col">
+    <div class="anchor" id="notifications"></div> <!-- notifications anchor -->
+    <h2 i18n>NOTIFICATIONS</h2>
+  </div>
+
+  <div class="content-col">
+    <my-account-notification-preferences [user]="user"></my-account-notification-preferences>
+  </div>
+</div>
+
+@if (user.pluginAuth === null) {
+  <div class="pt-two-cols mt-5"> <!-- password grid -->
+    <div class="title-col">
+      <h2 i18n>PASSWORD</h2>
+    </div>
+    <div class="content-col">
+      <my-account-change-password></my-account-change-password>
+    </div>
+  </div>
+}
+
+@if (user.pluginAuth === null) {
+  <div class="pt-two-cols mt-5"> <!-- two factor auth grid -->
+    <div class="title-col">
+      <h2 i18n>TWO-FACTOR AUTHENTICATION</h2>
+    </div>
+    <div class="content-col">
+      <my-account-two-factor-button [user]="user"></my-account-two-factor-button>
+    </div>
+  </div>
+}
+
+<div class="pt-two-cols mt-5">
+  <div class="title-col">
+    <h2 i18n>ACCOUNT SESSIONS</h2>
+  </div>
+
+  <div class="content-col">
+    <p i18n>These are the devices currently logged in to your account.</p>
+
+    <my-account-token-sessions [user]="user"></my-account-token-sessions>
+  </div>
+</div>
+
+<div class="pt-two-cols mt-5"> <!-- email grid -->
+  <div class="title-col">
+    <h2 i18n>EMAIL</h2>
+  </div>
+
+  <div class="content-col">
+    <my-account-email-preferences class="d-block mb-5" [user]="user"></my-account-email-preferences>
+
+    @if (user.pluginAuth === null) {
+      <my-account-change-email></my-account-change-email>
+    }
+  </div>
+</div>
+
+<div class="pt-two-cols mt-5"> <!-- danger zone grid -->
+  <div class="title-col">
+    <h2 i18n class="pt-title-danger">DANGER ZONE</h2>
+  </div>
+
+  <div class="content-col">
+    <my-account-danger-zone [user]="user"></my-account-danger-zone>
+  </div>
+</div>

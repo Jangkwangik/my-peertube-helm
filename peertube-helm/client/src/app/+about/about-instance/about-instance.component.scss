@@ -1,0 +1,26 @@
+@use '_variables' as *;
+@use '_bootstrap-variables' as *;
+@use '_mixins' as *;
+
+.content {
+  display: flex;
+  justify-content: space-between;
+
+  @include rfs(4rem, gap);
+}
+
+my-instance-stat-rules {
+  min-width: 600px;
+  max-width: 50%;;
+}
+
+@media screen and (max-width: #{breakpoint(xl)}) {
+  .content {
+    flex-wrap: wrap;
+  }
+
+  my-instance-stat-rules {
+    min-width: 100%;
+    max-width: unset;
+  }
+}

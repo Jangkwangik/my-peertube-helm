@@ -1,0 +1,133 @@
+@use 'sass:math';
+@use '_variables' as *;
+@use '_mixins' as *;
+
+@mixin build-channel-img-size ($video-img-width) {
+  $image-size: min(120px, $video-img-width);
+  $margin-size: math.div(($video-img-width - $image-size), 2); // So we have the same width as the video miniature
+
+  width: $image-size;
+  height: $image-size;
+  min-height: $image-size;
+  min-width: $image-size;
+
+  margin: 0 calc($margin-size + 1rem) 0 $margin-size;
+}
+
+.search-result {
+  padding: 40px;
+}
+
+.alert-danger {
+  margin-top: 10px;
+}
+
+.results-header {
+  padding-bottom: 20px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #DADADA;
+
+  .first-line {
+    display: flex;
+    flex-direction: row;
+
+    .results-counter {
+      flex-grow: 1;
+
+      .search-value {
+        font-weight: $font-semibold;
+      }
+    }
+  }
+}
+
+.filter-button my-global-icon {
+  @include global-icon-size(20px);
+  @include margin-right(0.5rem);
+}
+
+.entry {
+  display: flex;
+  margin-bottom: 40px;
+  max-width: 800px;
+}
+
+.video-channel {
+  my-actor-avatar {
+    @include build-channel-img-size($video-thumbnail-width);
+  }
+}
+
+.video-channel-info {
+  flex-grow: 1;
+  width: fit-content;
+}
+
+.video-channel-names {
+  display: flex;
+  align-items: baseline;
+  color: pvar(--fg);
+  width: fit-content;
+  flex-wrap: wrap;
+
+  @include disable-default-a-behaviour;
+}
+
+.video-channel-display-name {
+  font-weight: $font-semibold;
+}
+
+.video-channel-name {
+  color: pvar(--fg-300);
+}
+
+// Use the same breakpoints as in video-miniature
+@include on-small-main-col {
+  .video-channel {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+
+    my-actor-avatar {
+      grid-column: 1;
+      grid-row: 1 / -1;
+
+      @include build-channel-img-size($video-thumbnail-medium-width);
+    }
+  }
+
+  .video-channel-info {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  my-subscribe-button {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: end;
+  }
+}
+
+@include on-mobile-main-col {
+  .video-channel my-actor-avatar {
+    @include build-channel-img-size($video-thumbnail-small-width);
+  }
+}
+
+@media screen and (max-width: $mobile-view) {
+  .search-result {
+    padding: 20px 10px;
+
+    .results-header {
+      font-size: 15px !important;
+    }
+  }
+
+  .video-channel-display-name {
+    font-size: $miniature-fs-mobile-big;
+  }
+
+  .video-channel-name {
+    font-size: $miniature-fs-mobile-medium;
+  }
+}

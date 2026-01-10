@@ -1,0 +1,57 @@
+<ng-template #modal>
+  <div class="modal-header">
+    <h4 class="modal-title">
+      @if (isAdminView()) {
+        <ng-container i18n>Messages with the reporter</ng-container>
+      }
+      @if (!isAdminView()) {
+        <ng-container i18n>Messages with the moderation team</ng-container>
+      }
+    </h4>
+
+    <button class="border-0 p-0" title="Close this modal" i18n-title (click)="hide()">
+      <my-global-icon iconName="cross"></my-global-icon>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <div class="messages">
+      @for (message of abuseMessages; track message) {
+        <div
+          class="message-block" [ngClass]="{ 'by-moderator': message.byModerator, 'by-me': isMessageByMe(message) }"
+          >
+          <div class="author">{{ message.account.name }}</div>
+          <div class="bubble">
+            <div class="content" [innerHTML]="message.messageHtml"></div>
+            <div class="date">{{ message.createdAt | ptDate }}</div>
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (noResults) {
+      <div class="no-messages" i18n>No messages for now.</div>
+    }
+
+    <form novalidate [formGroup]="form" (ngSubmit)="addMessage()">
+      <div class="form-group">
+        <textarea
+          formControlName="message" ngbAutofocus [placeholder]="getPlaceholderMessage()"
+          [ngClass]="{ 'input-error': formErrors['message'] }" class="form-control"
+        ></textarea>
+
+        @if (formErrors.message) {
+          <div class="form-error" role="alert">
+            {{ formErrors.message }}
+          </div>
+        }
+      </div>
+
+      <div class="form-group inputs">
+        <input type="submit" i18n-value value="Add a message" class="peertube-button primary-button" [disabled]="!form.valid || sendingMessage">
+      </div>
+    </form>
+
+  </div>
+
+</ng-template>

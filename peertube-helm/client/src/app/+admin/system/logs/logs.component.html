@@ -1,0 +1,91 @@
+<div class="header">
+
+  <div>
+    <label i18n for="log-type">Log type</label>
+
+    <div class="peertube-select-container">
+      <select id="log-type" [(ngModel)]="logType" (ngModelChange)="refresh()" class="form-control">
+        @for (logTypeChoice of logTypeChoices; track logTypeChoice) {
+          <option [value]="logTypeChoice.id">{{ logTypeChoice.label }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  @if (!isAuditLog()) {
+    <div>
+      <label i18n for="log-start-date">Start date</label>
+
+      <my-select-options inputId="log-start-date" [items]="timeChoices" [(ngModel)]="startDate" (ngModelChange)="refresh()">
+        <ng-template #selectOption let-item>
+          {{ item.label }} ({{ item.id | ptDate: item.dateFormat }} - <span i18n>now</span>)
+        </ng-template>
+      </my-select-options>
+    </div>
+
+    <div>
+      <label i18n for="log-level">Log level</label>
+
+      <my-select-options inputId="log-level" [items]="levelChoices" [(ngModel)]="level" (ngModelChange)="refresh()">
+        <ng-template #selectOption let-item>
+          <span class="level-choice me-1" [ngClass]="item.id">&#11044;</span> {{ item.label }}
+        </ng-template>
+      </my-select-options>
+    </div>
+
+    @if (!isAuditLog()) {
+      <div>
+        <label i18n for="log-tags">Filter logs by tags</label>
+
+        <my-select-tags
+          inputId="log-tags"
+          i18n-placeholder placeholder="Example: ffmpeg, api"
+          [(ngModel)]="tagsOneOf" (ngModelChange)="refresh()"
+        ></my-select-tags>
+      </div>
+    }
+  }
+
+  <my-button class="mt-auto" i18n-label label="Refresh" icon="refresh" (click)="refresh()"></my-button>
+</div>
+
+<div class="logs">
+  @if (loading) {
+    <div i18n>Loading...</div>
+  }
+
+  <div #logsElement>
+    @if (logs.length !== 0) {
+      <my-copy-button
+        i18n-notification notification="Logs copied" i18n-title title="Copy logs"
+        withBorder="true" [elementContent]="logsContent"
+      ></my-copy-button>
+    }
+
+    @if (!loading && logs.length === 0) {
+      <div i18n>No log.</div>
+    }
+
+    <div #logsContent>
+      @for (log of logs; track log) {
+        <div class="log-row" [ngClass]="{ error: log.level === 'error', warn: log.level === 'warn' }">
+          <span class="log-level">{{ log.level }}</span>
+
+          <span class="log-date">[{{ log.localeDate }}]</span>
+
+          @if (log.by) {
+            <strong class="log-by" i18n>By {{ log.by }} -></strong>
+          }
+
+          @if (log.domain) {
+            <strong class="log-domain-action">{{ log.domain }} -> {{ log.action }}</strong>
+          }
+
+          {{ log.message }}
+
+          <pre>{{ log.meta }}</pre>
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,23 @@
+<div class="d-flex align-items-center">
+  <my-select-options
+    class="flex-grow-1"
+
+    [inputId]="inputId()"
+    [disabled]="disabled"
+
+    [items]="itemsWithCustom"
+    [(ngModel)]="selectedId"
+    (ngModelChange)="onModelChange()"
+  ></my-select-options>
+
+  @if (isCustomValue()) {
+    <input
+      [attr.aria-labelledby]="labelId()" [(ngModel)]="customValue" (ngModelChange)="onModelChange()"
+      [type]="inputType()" class="ms-2 form-control pt-input-text"
+      />
+
+    @if (inputSuffix()) {
+      <span class="ms-1">{{ inputSuffix() }}</span>
+    }
+  }
+</div>

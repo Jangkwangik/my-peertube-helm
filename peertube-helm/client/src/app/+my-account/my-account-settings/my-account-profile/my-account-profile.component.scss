@@ -1,0 +1,19 @@
+@use '_variables' as *;
+@use '_mixins' as *;
+@use '_form-mixins' as *;
+
+input#username + .muted {
+  margin-top: 5px;
+}
+
+input[type=text] {
+  @include peertube-input-text(340px);
+}
+
+textarea {
+  max-width: 100%;
+
+  display: block;
+
+  @include peertube-textarea(100%, 150px);
+}

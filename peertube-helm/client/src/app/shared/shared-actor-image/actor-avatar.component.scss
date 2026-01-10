@@ -1,0 +1,70 @@
+@use "_variables" as *;
+@use "_mixins" as *;
+
+.avatar {
+  // Defined in component
+  width: var(--co-avatar-size);
+  height: var(--co-avatar-size);
+  min-width: var(--co-avatar-size);
+  min-height: var(--co-avatar-size);
+
+  &.account {
+    object-fit: cover;
+    border-radius: $account-avatar-radius;
+  }
+
+  &.channel {
+    border-radius: $channel-avatar-radius;
+  }
+
+  &.instance {
+    border-radius: $instance-img-radius;
+  }
+}
+
+a {
+  @include disable-default-a-behaviour;
+}
+
+.initial {
+  background-color: #3C2109;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // Defined in component
+  font-size: var(--co-font-size);
+  line-height: var(--co-avatar-size);
+
+  &.blue {
+    background-color: #009FD4;
+  }
+
+  &.green {
+    background-color: #00AA55;
+  }
+
+  &.purple {
+    background-color: #B381B3;
+  }
+
+  &.gray {
+    background-color: #939393;
+  }
+
+  &.yellow {
+    background-color: #AA8F00;
+  }
+
+  &.orange {
+    background-color: #D47500;
+  }
+
+  &.red {
+    background-color: #E76E3C;
+  }
+
+  &.dark-blue {
+    background-color: #0A3055;
+  }
+}

@@ -1,0 +1,16 @@
+@use "_variables" as *;
+@use "_mixins" as *;
+@use "_form-mixins" as *;
+
+.redundancies-charts {
+  margin-top: 50px;
+
+  .chart-blocks {
+    display: flex;
+    justify-content: center;
+
+    .chart-block {
+      margin: 0 20px;
+    }
+  }
+}

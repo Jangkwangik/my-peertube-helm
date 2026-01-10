@@ -1,0 +1,49 @@
+@use "_variables" as *;
+@use "_mixins" as *;
+@use "_button-mixins" as *;
+
+@mixin reduced-padding {
+  padding: pvar(--input-y-padding) calc(#{pvar(--input-x-padding)} / 2) !important;
+}
+
+@mixin hide-label {
+  .button-label {
+    display: none;
+  }
+}
+
+:host {
+  display: inline-block;
+}
+
+.action-button {
+  width: 100%; // useful for ellipsis, allow to define a max-width on host component
+  vertical-align: top; // prevent additional height to the parent because of ellipsis
+
+  my-loader.displayed {
+    display: inline-flex;
+    vertical-align: middle;
+    margin-top: -1px;
+
+    @include margin-right(0.5rem);
+  }
+
+  &:not(.rounded-icon-button) {
+    &.has-icon {
+      @include button-with-icon(24px, 0, 0);
+    }
+  }
+
+  &.label-xl {
+    font-size: 90%;
+
+    @include reduced-padding();
+  }
+}
+
+@media screen and (max-width: $small-view) {
+  .responsive-label {
+    @include hide-label();
+    @include reduced-padding();
+  }
+}

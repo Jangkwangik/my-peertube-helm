@@ -1,0 +1,57 @@
+@use "_variables" as *;
+@use "_mixins" as *;
+
+.actor {
+  display: flex;
+}
+
+.actor-info {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+.actor-info-display-name {
+  font-weight: $font-bold;
+
+  @include peertube-word-wrap;
+  @include font-size(1.25rem);
+
+  @media screen and (max-width: $small-view) {
+    @include font-size(18px);
+  }
+}
+
+.actor-info-username {
+  position: relative;
+  font-size: 14px;
+  color: pvar(--fg-300);
+}
+
+.actor-info-followers {
+  padding-bottom: 0.5rem;
+}
+
+.actor-img-edit-button {
+  padding: 8px 20px;
+
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+}
+
+.button-focus-within:focus-within {
+  box-shadow: $focus-box-shadow-form;
+}
+
+.dropdown-item {
+  @include dropdown-with-icon-item;
+
+  label {
+    font-weight: normal;
+    margin: 0;
+  }
+}
+
+.dropdown-toggle::after {
+  display: none;
+}

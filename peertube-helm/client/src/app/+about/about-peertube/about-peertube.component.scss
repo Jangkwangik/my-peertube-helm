@@ -1,0 +1,24 @@
+@use '_variables' as *;
+@use '_mixins' as *;
+
+.margin-content {
+  max-width: 1200px;
+  margin-inline-start: auto;
+  margin-inline-end: auto;
+}
+
+.card {
+  flex-basis: 300px;
+
+  @include margin(2rem);
+}
+
+.card-title {
+  font-size: 1.1rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.card-body {
+  text-align: center;
+}

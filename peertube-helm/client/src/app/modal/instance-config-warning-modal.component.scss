@@ -1,0 +1,12 @@
+@use '_variables' as *;
+@use '_mixins' as *;
+
+li {
+  margin-bottom: 10px;
+}
+
+.mascot {
+  display: block;
+  margin: 0 auto 50px;
+  width: 25%;
+}

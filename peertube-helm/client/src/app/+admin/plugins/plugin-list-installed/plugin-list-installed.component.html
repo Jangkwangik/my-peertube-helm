@@ -1,0 +1,34 @@
+@if (pagination.totalItems === 0) {
+  <div class="no-results">
+    {{ getNoResultMessage() }}
+  </div>
+}
+
+<div class="plugins" myInfiniteScroller (nearOfBottom)="onNearOfBottom()" [dataObservable]="onDataSubject.asObservable()">
+  @for (plugin of plugins; track plugin) {
+    <my-plugin-card [plugin]="plugin" [version]="plugin.version" [pluginType]="pluginType">
+      <div ngProjectAs="buttons">
+        @if (!isTheme(plugin)) {
+          <my-button
+            [ptRouterLink]="getShowRouterLink(plugin)" label="Settings" i18n-label
+            [responsiveLabel]="true" icon="config"
+          ></my-button>
+        }
+
+        @if (isUpdateAvailable(plugin)) {
+          <my-button
+            class="update-button" (click)="update(plugin)" [loading]="isUpdating(plugin)"
+            [attr.disabled]="isUpdating(plugin) || isUninstalling(plugin)"
+            [label]="getUpdateLabel(plugin)" icon="refresh" [responsiveLabel]="true"
+          ></my-button>
+        }
+
+        <my-delete-button
+          (click)="uninstall(plugin)"
+          label="Uninstall" i18n-label [responsiveLabel]="true"
+          [disabled]="isUpdating(plugin) || isUninstalling(plugin)"
+        ></my-delete-button>
+      </div>
+    </my-plugin-card>
+  }
+</div>

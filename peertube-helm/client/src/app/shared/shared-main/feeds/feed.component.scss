@@ -1,0 +1,22 @@
+@use '_variables' as *;
+@use '_mixins' as *;
+
+.feed {
+  width: 100%;
+  color: inherit;
+}
+
+.feed-link {
+  color: pvar(--fg);
+  display: block;
+  min-width: 100px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+my-global-icon {
+  width: 100%;
+  height: 100%;
+}

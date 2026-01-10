@@ -1,0 +1,29 @@
+@use "_variables" as *;
+@use "_mixins" as *;
+@use "_form-mixins" as *;
+
+form {
+  margin-top: 40px;
+}
+
+.radio-label {
+  font-weight: $font-bold;
+}
+
+.peertube-radio-container {
+  display: inline-block;
+
+  @include margin-right(30px);
+}
+
+.peertube-select-container {
+  margin-bottom: 1rem;
+}
+
+input[type="text"] {
+  @include peertube-input-text(100%);
+}
+
+.submit-button {
+  text-align: end;
+}

@@ -1,0 +1,46 @@
+@use '_variables' as *;
+@use '_mixins' as *;
+
+table {
+  font-size: 14px;
+  color: pvar(--fg);
+  width: 100%;
+
+  .t-label,
+  .t-sub-label {
+    &.t-label {
+      font-weight: $font-semibold;
+    }
+
+    &.t-sub-label {
+      font-weight: $font-regular;
+
+      @include padding-left(30px);
+    }
+
+    .more-info {
+      font-style: italic;
+      font-weight: initial;
+      font-size: 14px;
+    }
+  }
+
+  th,
+  td {
+    padding: 0.75rem;
+    border-top: 1px solid #dee2e6;
+  }
+
+  caption {
+    caption-side: top;
+    font-weight: $font-semibold;
+    color: pvar(--fg);
+  }
+
+  .plugin,
+  .theme {
+    &:not(:last-child)::after {
+      content: '•';
+    }
+  }
+}

@@ -1,0 +1,69 @@
+@use '_variables' as *;
+@use '_mixins' as *;
+
+my-signup-step-title strong {
+  font-weight: $font-bold;
+}
+
+.signup-disabled {
+  padding-top: 30vh;
+}
+
+my-instance-about-accordion {
+  display: block;
+  margin-bottom: 30px;
+}
+
+.step-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+
+  .skip-step {
+    display: inline-block;
+
+    @include margin-right(30px);
+  }
+
+  .skip-step-description {
+    margin-top: 5px;
+    font-size: 14px;
+  }
+
+  > button,
+  .skip-step {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .skip-step,
+  button[cdkStepperNext] {
+    @include margin-left(auto);
+  }
+
+  .skip-step + button[cdkStepperNext] {
+    @include margin-left(0);
+  }
+}
+
+.done-loader {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+
+  my-loader {
+    margin-bottom: 20px;
+  }
+}
+
+@media screen and (max-width: $small-view) {
+  .step-buttons {
+    justify-content: space-between;
+
+    .skip-step,
+    button[cdkStepperNext] {
+      @include margin-left(0);
+    }
+  }
+}

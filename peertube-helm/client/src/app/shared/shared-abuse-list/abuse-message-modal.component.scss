@@ -1,0 +1,69 @@
+@use '_variables' as *;
+@use '_mixins' as *;
+@use '_form-mixins' as *;
+
+form {
+  margin: 20px 20px 0 0;
+
+  .form-group:first-child {
+    // Keep place to display error message without modifying the height
+    min-height: 125px;
+  }
+}
+
+textarea {
+  margin-top: 20px;
+
+  @include peertube-textarea(100%, 70px);
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+  max-height: 50vh;
+}
+
+.no-messages {
+  display: flex;
+  justify-content: center;
+}
+
+.message-block {
+  margin: 0 5px 10px 0;
+  max-width: 60%;
+
+  .author {
+    color: pvar(--fg-300);
+    font-size: 14px;
+    padding: 0 0 3px 10px;
+  }
+
+  .bubble {
+    border-radius: 10px;
+    padding: 5px 10px;
+    color: pvar(--fg);
+    background-color: pvar(--bg-secondary-400);
+
+    .date {
+      font-size: 13px;
+      color: pvar(--fg-300);
+    }
+  }
+
+  &.by-me {
+
+    .bubble {
+      color: pvar(--on-primary-400);
+      background-color: pvar(--primary-400);
+
+      .date {
+        color: pvar(--on-primary-400);
+      }
+    }
+  }
+
+  &.by-moderator {
+    align-self: flex-end;
+  }
+}

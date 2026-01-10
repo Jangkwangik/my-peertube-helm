@@ -1,0 +1,67 @@
+@use '_variables' as *;
+@use '_mixins' as *;
+@use '_form-mixins' as *;
+
+.btn-group {
+  padding: 0;
+
+  .peertube-button {
+    // Prevent weird border radius blur on chrome
+    z-index: unset !important;
+    padding: pvar(--input-y-padding) 10px;
+  }
+
+  .dropdown-toggle::after {
+    position: relative;
+    top: 1px;
+  }
+
+  .dropdown-toggle:not(.dropdown-toggle-split)::after {
+    margin-left: 0.5rem;
+  }
+
+  .dropdown-toggle-split {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  &:not(.big) {
+    white-space: nowrap;
+  }
+
+  &.big > button:first-child {
+    width: max-content;
+    min-width: 175px;
+  }
+
+  .dropdown-menu {
+    cursor: default;
+
+    button {
+      cursor: pointer;
+    }
+
+    .dropdown-item {
+      @media screen and (max-width: $mobile-view) {
+        white-space: normal;
+      }
+    }
+
+    .dropdown-item-neutral {
+      cursor: default;
+
+      &:hover,
+      &:focus {
+        background-color: inherit;
+      }
+    }
+  }
+
+  ::ng-deep form {
+    padding: 0.25rem 1rem;
+  }
+
+  input {
+    @include peertube-input-text(100%);
+  }
+}

@@ -1,0 +1,98 @@
+@use '_variables' as *;
+@use '_mixins' as *;
+@use '_miniature' as *;
+
+.video-thumbnail {
+  @include miniature-thumbnail;
+}
+
+.progress-bar {
+  height: 3px;
+  width: 100%;
+  position: absolute;
+  z-index: z(miniature);
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.2);
+
+  div {
+    height: 100%;
+    background-color: pvar(--border-primary);
+    border-radius: 6px;
+  }
+}
+
+.watch-icon-overlay,
+.duration-overlay,
+.live-overlay {
+  font-size: 0.75rem;
+  line-height: normal;
+  z-index: z(miniature);
+
+  @include static-thumbnail-overlay;
+}
+
+.label-overlay {
+  position: absolute;
+  padding: 0 5px;
+  left: 5px;
+  top: 5px;
+  z-index: z(miniature);
+}
+
+.duration-overlay,
+.live-overlay {
+  position: absolute;
+  padding: 2px 8px;
+  right: 0;
+  bottom: 0;
+  border-top-left-radius: 4px;
+}
+
+.live-overlay {
+  font-weight: $font-bold;
+  color: #F4F4F5;
+
+  &.live-streaming {
+    color: #F4F4F5;
+
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 100%;
+      background-color: pvar(--border-primary);
+      position: relative;
+      top: -1px;
+
+      @include margin-right(8px);
+    }
+  }
+}
+
+.actions-overlay {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  right: 5px;
+  top: 5px;
+  opacity: 0;
+
+  font-weight: $font-semibold;
+
+  div:not(:first-child) {
+    margin-top: 2px;
+  }
+}
+
+.watch-icon-overlay {
+  padding: 3px;
+  border-radius: 3px;
+
+  my-global-icon {
+    width: 22px;
+    height: 22px;
+
+    color: #F4F4F5;
+  }
+}

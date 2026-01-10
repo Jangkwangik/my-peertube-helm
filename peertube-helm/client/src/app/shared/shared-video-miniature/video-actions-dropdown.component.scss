@@ -1,0 +1,16 @@
+:host {
+  position: relative;
+}
+
+.playlist-dropdown {
+  position: absolute;
+
+  .anchor {
+    display: block;
+    opacity: 0;
+  }
+}
+
+:host ::ng-deep .icon-playlist-add {
+  left: 2px;
+}

@@ -1,0 +1,47 @@
+@use '_variables' as *;
+@use '_mixins' as *;
+
+.banner-placeholder {
+  @include block-ratio('> div, > img', $banner-inverted-ratio);
+}
+
+.banner-placeholder {
+  background-color: pvar(--bg-secondary-500);
+}
+
+.actor-img-edit-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dropdown {
+  position: absolute;
+
+  > .actor-img-edit-button {
+    position: relative;
+  }
+}
+
+.actor-img-edit-button {
+  width: auto;
+  position: absolute;
+
+  label {
+    font-weight: $font-semibold;
+    margin-bottom: 0;
+  }
+}
+
+.button-focus-within:focus-within {
+  box-shadow: $focus-box-shadow-form;
+}
+
+.dropdown-item {
+  @include dropdown-with-icon-item;
+}
+
+.dropdown-toggle::after {
+  display: none;
+}

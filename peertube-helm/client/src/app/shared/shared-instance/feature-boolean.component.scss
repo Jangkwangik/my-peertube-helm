@@ -1,0 +1,10 @@
+@use '_variables' as *;
+@use '_mixins' as *;
+
+my-global-icon[iconName=tick] {
+  color: pvar(--green);
+}
+
+my-global-icon[iconName=cross] {
+  color: pvar(--red);
+}

@@ -1,0 +1,31 @@
+<div class="top-buttons">
+  <div class="search-wrapper">
+    <my-advanced-input-filter emitOnInit="true" (search)="onSearch($event)"></my-advanced-input-filter>
+  </div>
+
+  <div class="history-switch">
+    <my-input-switch inputName="track-watch-history" [(ngModel)]="videosHistoryEnabled" (ngModelChange)="onVideosHistoryChange()"></my-input-switch>
+    <label for="track-watch-history" i18n>Track watch history</label>
+  </div>
+
+  <my-button icon="delete" (click)="clearAllHistory()" i18n>Clear all history</my-button>
+</div>
+
+<my-videos-selection
+  [pagination]="pagination"
+  [(videos)]="videos"
+  [miniatureDisplayOptions]="miniatureDisplayOptions"
+  [titlePage]="titlePage"
+  [getVideosObservableFunction]="getVideosObservableFunction"
+  [user]="user"
+  [noResultMessage]="getNoResultMessage()"
+  [enableSelection]="false"
+  [disabled]="disabled"
+  #videosSelection
+>
+  <ng-template ptTemplate="rowButtons" let-video>
+    <div class="action-button">
+      <my-delete-button i18n-label label="Delete from history" (click)="deleteHistoryElement(video)"></my-delete-button>
+    </div>
+  </ng-template>
+</my-videos-selection>

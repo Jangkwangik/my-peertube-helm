@@ -1,0 +1,26 @@
+@if (plugin) {
+  <h2 class="mb-4">
+    <ng-container>{{ pluginTypeLabel }}</ng-container>
+    {{ plugin.name }}
+  </h2>
+
+  @if (hasRegisteredSettings()) {
+    <form (ngSubmit)="formValidated()" [formGroup]="form">
+      @for (setting of registeredSettings; track setting) {
+        <div [id]="getWrapperId(setting)">
+          <my-dynamic-form-field [hidden]="isSettingHidden(setting)" [form]="form" [setting]="setting" [formErrors]="formErrors"></my-dynamic-form-field>
+        </div>
+      }
+
+      <input class="peertube-button primary-button mt-3" type="submit" i18n value="Update plugin settings" [disabled]="!form.valid">
+    </form>
+  }
+
+  @if (!hasRegisteredSettings()) {
+    @if (isPlugin()) {
+      <div i18n class="no-settings">This plugin does not have settings.</div>
+    } @else if (isTheme()) {
+      <div i18n class="no-settings">This theme does not have settings.</div>
+    }
+  }
+}

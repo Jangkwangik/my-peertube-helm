@@ -1,0 +1,35 @@
+@if (hasDoneFirstQuery && videos().length === 0) {
+  <div class="no-results" i18n>{{ noResultMessage() }}</div>
+}
+
+<div class="videos" myInfiniteScroller (nearOfBottom)="onNearOfBottom()" [dataObservable]="onDataSubject.asObservable()">
+  @for (video of videos(); track videoById(i, video); let i = $index) {
+    <div class="video">
+      @if (enableSelection()) {
+        <div class="checkbox-container">
+          <my-peertube-checkbox [inputName]="'video-check-' + video.id" [(ngModel)]="selection()[video.id]"></my-peertube-checkbox>
+        </div>
+      }
+
+      <my-video-miniature
+        [video]="video"
+        [displayAsRow]="true"
+        [displayOptions]="miniatureDisplayOptions()"
+        [displayVideoActions]="false"
+        [user]="user()"
+      ></my-video-miniature>
+
+      @if (isInSelectionMode() === false) {
+        <ng-container *ngTemplateOutlet="rowButtonsTemplate; context: {$implicit: video}"></ng-container>
+      }
+    </div>
+  }
+</div>
+
+@if (isInSelectionMode() === true) {
+  <div class="action-selection-mode">
+    <button i18n class="cancel-selection peertube-button secondary-button me-2" (click)="abortSelectionMode()">Cancel</button>
+
+    <ng-container *ngTemplateOutlet="globalButtonsTemplate"></ng-container>
+  </div>
+}

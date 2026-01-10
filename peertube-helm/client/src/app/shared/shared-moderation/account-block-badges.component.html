@@ -1,0 +1,15 @@
+@if (account().mutedByUser) {
+  <span class="pt-badge badge-danger" i18n>Muted</span>
+}
+
+@if (account().mutedServerByUser) {
+  <span class="pt-badge badge-danger" i18n>Instance muted</span>
+}
+
+@if (account().mutedByInstance) {
+  <span class="pt-badge badge-danger" i18n>Muted by your instance</span>
+}
+
+@if (account().mutedServerByInstance) {
+  <span class="pt-badge badge-danger" i18n>Instance muted by your instance</span>
+}

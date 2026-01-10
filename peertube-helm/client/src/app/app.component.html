@@ -1,0 +1,70 @@
+@if (customCSS) {
+  <div [innerHTML]="customCSS"></div>
+}
+
+<a i18n class="visually-hidden-focusable skip-to-content" href="#content" (click)="$event.preventDefault(); mainContent.focus()">Skip to main content</a>
+
+<my-hotkeys-cheat-sheet (hotkeysModalStateChange)="onHotkeysModalStateChange($event)"></my-hotkeys-cheat-sheet>
+
+<div
+  class="peertube-container"
+  [ngClass]="{ 'user-logged-in': isUserLoggedIn(), 'user-not-logged-in': !isUserLoggedIn(), 'hotkeys-modal-opened': hotkeysModalOpened }"
+  >
+  <header class="root-header">
+    <my-header class="w-100"></my-header>
+  </header>
+
+  <div class="sub-header-container">
+    <my-menu id="left-menu" role="navigation" aria-label="Main menu" i18n-ariaLabel></my-menu>
+
+    <main #mainContent tabindex="-1" id="content" class="main-col" [ngClass]="{ expanded: menu.isCollapsed() }">
+
+      <div class="main-row">
+
+        @if (broadcastMessage) {
+          <div class="broadcast-message alert margin-content" [ngClass]="broadcastMessage.class">
+            <div class="text-break" [innerHTML]="broadcastMessage.message"></div>
+            @if (broadcastMessage.dismissable) {
+              <button
+                (click)="hideBroadcastMessage()"
+                class="border-0" title="Close this message" i18n-title
+                >
+                <my-global-icon iconName="cross"></my-global-icon>
+              </button>
+            }
+          </div>
+        }
+
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+</div>
+
+<ngx-loading-bar [includeSpinner]="false" color="var(--border-primary)"></ngx-loading-bar>
+
+<my-confirm></my-confirm>
+
+<p-toast position="bottom-right">
+  <ng-template let-message #message>
+    <div class="notification-block">
+      <my-global-icon [iconName]="getNotificationIcon(message)"></my-global-icon>
+
+      <div class="message">
+        <h3>{{ message.summary }}</h3>
+        <p>{{ message.detail }}</p>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
+@defer (when isUserLoggedIn()) {
+  <my-account-setup-warning-modal #accountSetupWarningModal (created)="onModalCreated()"></my-account-setup-warning-modal>
+}
+
+@defer (when isUserAdmin()) {
+  <my-admin-config-wizard-modal #adminConfigWizardModal (created)="onModalCreated()"></my-admin-config-wizard-modal>
+  <my-instance-config-warning-modal #instanceConfigWarningModal (created)="onModalCreated()"></my-instance-config-warning-modal>
+}
+
+<my-custom-modal #customModal></my-custom-modal>
