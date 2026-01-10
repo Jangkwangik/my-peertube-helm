@@ -6,7 +6,8 @@ image:
   registry: "docker.io"
   repository: chocobozzz/peertube
   pullPolicy: IfNotPresent
-  tag: "v6.3.3" # PeerTube 안정 버전 명시
+  # [1] PeerTube 안정 버전 고정
+  tag: "v6.3.3"
 
 imagePullSecrets: []
 
@@ -29,7 +30,6 @@ tolerations: []
 affinity: {}
 nodeSelector: {}
 
-# [1] 저장소 설정
 persistence:
   enabled: true
   accessModes:
@@ -65,13 +65,11 @@ serviceAccount:
   annotations: {}
   name: "peertube-sa"
 
-# [2] 서비스 로드밸런서 설정
 service:
   enabled: true
   type: LoadBalancer
   port: 80
 
-# [3] 인그레스 끄기
 ingress:
   enabled: false
   className: "nginx"
@@ -83,22 +81,25 @@ ingress:
           pathType: Prefix
   tls: []
 
-# [4] PeerTube 앱 설정 (비밀번호 Base64 & 단순화)
 peertube:
   log_level: info
   trust_proxy: '10.0.0.0/8'
   webserver_hostname: chart-example.local
   webserver_port: 80
   webserver_https: false
-  secret: "Zml4ZWRzZWNyZXQ=" # fixedsecret (Base64)
+  # [2] 비밀번호 (Base64 형식)
+  secret: "Zml4ZWRzZWNyZXQ="
   existingSecret: ""
   existingSecretKey: "secret"
 
   admin:
     email: "admin@example.com"
-    password: "cGFzc3dvcmQ=" # password (Base64)
+    password: "cGFzc3dvcmQ="
     existingSecret: ""
-    # 👇 [수정됨] 에러 원인이던 Keys 설정 제거 (차트 기본값 사용)
+    # [3] 에러 방지용 빈 키 설정 복구
+    existingSecretKeys:
+      email: ""
+      password: ""
 
   s3:
     enabled: false
@@ -106,17 +107,31 @@ peertube:
   smtp:
     enabled: false
 
-# [5] 외부 DB 사용 안 함
+# [4] 외부 DB 설정 (안 써도 비밀번호 필수! ⭐여기가 에러 원인이었음⭐)
 externalDatabase:
   enabled: false
+  hostname: "peertube-postgres-rw"
+  database: "peertube"
+  username: "peertube"
+  password: "cGFzc3dvcmQ=" # 가짜 비번이라도 꼭 있어야 함!
+  existingSecret: ""
+  existingSecretKeys:
+    hostname: ""
+    database: ""
+    username: ""
+    password: ""
 
+# [5] 외부 캐시 설정 (안 써도 비밀번호 필수!)
 externalValkey:
   enabled: false
+  hostname: "valkey-primary"
+  password: "cGFzc3dvcmQ=" # 가짜 비번이라도 꼭 있어야 함!
+  existingSecret: ""
+  existingSecretKey: "valkey-password"
 
-# [6] 내부 DB 설정 (이미지 버전 강제 고정 & 비밀번호)
+# [6] 내부 DB 설정 (이미지 버전 고정 & 비밀번호)
 postgresql:
   enabled: true
-  # 👇 [중요] 존재하지 않는 17.x 버전 대신 안정적인 16.x 버전 사용
   image:
     tag: "16.1.0-debian-11-r8"
   auth:
@@ -126,11 +141,9 @@ postgresql:
     postgresPassword: "cGFzc3dvcmQ="
     existingSecret: ""
 
-# [7] 내부 캐시 설정 (이미지 버전 강제 고정 & 비밀번호)
+# [7] 내부 캐시 설정 (이미지 버전 고정 & 비밀번호)
 valkey:
   enabled: true
-  # 👇 [중요] 존재하지 않는 8.x 대신 호환되는 Redis 이미지 사용 고려했으나
-  # Valkey 안정 버전 태그 지정
   image:
     tag: "7.2.4-debian-11-r2"
   auth:
