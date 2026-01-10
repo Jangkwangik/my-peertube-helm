@@ -29,15 +29,12 @@ tolerations: []
 affinity: {}
 nodeSelector: {}
 
-# -----------------------------------------------------------
-# [중요 변경 1] 저장소(Persistence) 활성화 (AWS gp2 사용)
-# -----------------------------------------------------------
+# [1] 저장소 설정 (필수)
 persistence:
-  enabled: true             # false -> true로 변경
-  annotations: {}
+  enabled: true
   accessModes:
     - ReadWriteOnce
-  storageClassName: "gp2"   # AWS용 스토리지 클래스 지정
+  storageClassName: "gp2"
   storage: "10Gi"
   existingClaim: ""
 
@@ -61,82 +58,73 @@ readinessProbe:
 
 autoscaling:
   enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
 
 serviceAccount:
   create: true
   automount: true
-  annotations: {}
   name: "peertube-sa"
 
-# -----------------------------------------------------------
-# [중요 변경 2] 서비스 타입을 LoadBalancer로 변경 (자동 외부 노출)
-# -----------------------------------------------------------
+# [2] 서비스 로드밸런서 설정
 service:
   enabled: true
-  type: LoadBalancer        # ClusterIP -> LoadBalancer로 변경
+  type: LoadBalancer
   port: 80
 
-# -----------------------------------------------------------
-# [중요 변경 3] Ingress 끄기 (LoadBalancer를 쓰므로 끔)
-# -----------------------------------------------------------
+# [3] 인그레스 끄기
 ingress:
-  enabled: false            # true -> false (초기 설정 단순화)
+  enabled: false
   className: "nginx"
-  annotations: {}
   hosts:
     - host: chart-example.local
       paths:
         - path: /
           pathType: Prefix
-  tls: []
 
+# [4] PeerTube 앱 설정 (비밀번호 채움)
 peertube:
   log_level: info
   trust_proxy: '10.0.0.0/8'
   webserver_hostname: chart-example.local
   webserver_port: 80
   webserver_https: false
-  secret: "changeme123"      # 임시 시크릿 키 추가
+  secret: "peertube_secret_key_12345" # 값 필수
   existingSecret: ""
   existingSecretKey: "secret"
 
   admin:
     email: "admin@example.com"
-    password: "password123!" # 초기 관리자 비밀번호 설정
+    password: "adminpassword123!"     # 값 필수
 
   s3:
     enabled: false
 
   smtp:
-    enabled: false           # SMTP 비활성화 (나중에 설정)
+    enabled: false
 
+# [5] 외부 DB 설정 (안 써도 비밀번호는 채워야 함 - 에러 원인 추정)
 externalDatabase:
   enabled: false
+  hostname: "peertube-postgres-rw"
+  database: "peertube"
+  username: "peertube"
+  password: "dummy_password_fix"      # ⭐ 여기에 값이 없어서 에러났을 확률 높음!
 
 externalValkey:
   enabled: false
+  hostname: "valkey-primary"
+  password: "dummy_password_fix"
 
-# -----------------------------------------------------------
-# [중요 변경 4] PostgreSQL 비밀번호 설정 (에러 해결)
-# -----------------------------------------------------------
+# [6] 내부 DB 설정 (값 필수)
 postgresql:
   enabled: true
   auth:
     database: peertube_production
     username: peertube
-    password: "dbpassword123!"         # 비밀번호 필수 입력
-    postgresPassword: "dbpassword123!" # 관리자 비번 필수 입력
-    existingSecret: ""
+    password: "dbpassword123!"         # 값 필수
+    postgresPassword: "dbpassword123!" # 값 필수
 
-# -----------------------------------------------------------
-# [중요 변경 5] Valkey(Redis) 비밀번호 설정 (에러 해결)
-# -----------------------------------------------------------
+# [7] 내부 캐시 설정 (값 필수)
 valkey:
   enabled: true
   auth:
-    password: "redispassword123!"      # 비밀번호 필수 입력
-    existingSecret: ""
-    existingSecretPasswordKey: ""
+    password: "redispassword123!"      # 값 필수
