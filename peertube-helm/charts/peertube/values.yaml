@@ -32,7 +32,7 @@ extraEnv: []
 envFrom: []
 
 # -- extra init containers for the default deployment
-initcontainers: {}
+initContainers: {}
 
 # -- extra pod annotations for the deployment
 podAnnotations: {}
@@ -169,9 +169,9 @@ peertube:
     existingSecret: ""
     existingSecretKeys:
       # -- a key in an existing Kubernetes Secret for Peertube's admin user email
-      email: "-"
+      email: ""
       # -- a key in an existing Kubernetes Secret for Peertube's admin password
-      password: "-"
+      password: ""
 
   s3:
     # -- enable object storage, s3, for peertube
@@ -196,19 +196,19 @@ peertube:
     existingSecret: ""
     existingSecretKeys:
       # -- key in existing secret for s3 endpoint
-      endpoint: "-"
+      endpoint: ""
       # -- key in existing secret for s3 bucket for streaming playlists
-      streaming_playlists_bucket: "-"
+      streaming_playlists_bucket: ""
       # -- key in existing secret for s3 bucket for web videos
-      web_videos_bucket: "-"
+      web_videos_bucket: ""
       # -- key in existing secret for s3 bucket for user exports
-      user_exports_bucket: "-"
+      user_exports_bucket: ""
       # -- key in existing secret for s3 bucket for original video files
-      original_video_files_bucket: "-"
+      original_video_files_bucket: ""
       # -- key in existing secret for s3 access_key_id
-      access_key_id: "-"
+      access_key_id: ""
       # -- key in existing secret for s3 secret_access_key
-      secret_access_key: "-"
+      secret_access_key: ""
 
   smtp:
     # -- mail hostname
@@ -231,13 +231,13 @@ peertube:
     # keys in an existing Kubernetes Secret to use for connecting to SMTP host
     existingSecretKeys:
       # -- key in existing secret for smtp hostname
-      host: "-"
+      host: ""
       # -- key in existing secret for smtp port
-      port: "-"
+      port: ""
       # -- key in existing secret for smtp username
-      username: "-"
+      username: ""
       # -- key in existing secret for smtp password
-      password: "-"
+      password: ""
 
 # external database credentials
 externalDatabase:
