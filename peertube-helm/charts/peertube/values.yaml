@@ -155,7 +155,7 @@ peertube:
   # -- set peertube's secret
   secret: "peertube-secret-random-12345"
   # -- use an existing Kubernetes Secret for Peertube's secret
-  existingSecret: ""
+  existingSecret: "peertube-custom-secret"
   # -- a key in an existing Kubernetes Secret for Peertube's secret
   existingSecretKey: "secret"
 
