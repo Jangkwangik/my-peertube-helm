@@ -1,5 +1,3 @@
-nameOverride: ""
-fullnameOverride: ""
 replicaCount: 1
 
 image:
@@ -8,75 +6,34 @@ image:
   pullPolicy: IfNotPresent
   tag: "v6.3.3"
 
-# [핵심 수정] 빈 리스트([]) 대신 아예 주석 처리 (Helm이 건너뛰도록 함) ⭐
-# imagePullSecrets: []
-# containerCommand: []
+# [핵심] 에러 방지를 위해 명시적 빈 리스트 선언
+imagePullSecrets: []
 
-# [핵심 수정] 빈 리스트([]) 대신 아예 주석 처리 ⭐
-# extraEnv: []
-# envFrom: []
-# initcontainers: {}
-# podAnnotations: {}
-# podLabels: {}
-# podSecurityContext: {}
-# securityContext: {}
-# extraVolumes: []
-# extraVolumeMounts: []
-# tolerations: []
-# affinity: {}
-# nodeSelector: {}
+# [핵심] 도커 시작 명령어 명시 (들여쓰기 교정됨)
+containerCommand:
+  - gosu
+  - peertube
+  - npm
+  - start
+
+serviceAccount:
+  create: true
+  automount: true
+  name: "peertube-sa"
+  annotations: {}
 
 persistence:
   enabled: true
-  # annotations: {}
   accessModes:
     - ReadWriteOnce
   storageClassName: "gp2"
   storage: "10Gi"
   existingClaim: ""
 
-resources:
-  limits:
-    cpu: 1000m
-    memory: 1Gi
-  requests:
-    cpu: 500m
-    memory: 512Mi
-
-livenessProbe:
-  httpGet:
-    path: /
-    port: peertube
-
-readinessProbe:
-  httpGet:
-    path: /
-    port: peertube
-
-autoscaling:
-  enabled: false
-
-serviceAccount:
-  create: true
-  automount: true
-  # annotations: {}
-  name: "peertube-sa"
-
 service:
   enabled: true
   type: LoadBalancer
   port: 80
-
-ingress:
-  enabled: false
-  className: "nginx"
-  # annotations: {}
-  hosts:
-    - host: localhost
-      paths:
-        - path: /
-          pathType: Prefix
-  tls: []
 
 peertube:
   log_level: info
@@ -87,11 +44,10 @@ peertube:
   secret: "peertube-secret-random-12345"
   existingSecret: ""
   existingSecretKey: "secret"
-
+  
   admin:
     email: "admin@example.com"
-    # [1] 관리자 비번 (ArgoCD 주입)
-    password: "" 
+    password: "" # ArgoCD 주입
     existingSecret: ""
     existingSecretKeys:
       email: "-"
@@ -100,14 +56,11 @@ peertube:
   s3:
     enabled: true
     endpoint: "s3.amazonaws.com"
-    
-    # [2] 버킷 이름 직접 입력
-    streaming_playlists_bucket: "peertube-video-20260110185235674800000001"
-    web_videos_bucket: "peertube-video-20260110185235674800000001"
-    user_exports_bucket: "peertube-video-20260110185235674800000001"
-    original_video_files_bucket: "peertube-video-20260110185235674800000001"
-    
-    # [3] 키는 비워둠 (ArgoCD 주입)
+    # 더미 값 (ArgoCD에서 덮어씌움)
+    streaming_playlists_bucket: "dummy"
+    web_videos_bucket: "dummy"
+    user_exports_bucket: "dummy"
+    original_video_files_bucket: "dummy"
     access_key_id: ""
     secret_access_key: ""
     
@@ -141,11 +94,10 @@ peertube:
 
 externalDatabase:
   enabled: true
-  # [4] DB 주소 직접 입력
-  hostname: "peertube-db.c4dqgm4aut3y.us-east-1.rds.amazonaws.com"
+  # 더미 값 (ArgoCD에서 덮어씌움)
+  hostname: "dummy"
   database: "peertube"
   username: "peertube"
-  # [5] DB 비번 (ArgoCD 주입)
   password: ""
   existingSecret: ""
   existingSecretKeys:
@@ -159,7 +111,7 @@ externalValkey:
   hostname: ""
   password: ""
   existingSecret: ""
-  existingSecretKey: valkey-password
+  existingSecretKey: "-"
 
 postgresql:
   enabled: false
@@ -169,3 +121,34 @@ valkey:
   auth:
     password: "peertube-valkey-password"
     existingSecret: ""
+
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations: {}
+  hosts:
+    - host: localhost
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+# 빈 리스트 명시 (에러 방지)
+extraEnv: []
+envFrom: []
+initcontainers: {}
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+securityContext: {}
+extraVolumes: []
+extraVolumeMounts: []
+tolerations: []
+affinity: {}
+nodeSelector: {}
