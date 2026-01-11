@@ -1,20 +1,13 @@
 replicaCount: 1
-
 image:
   registry: "docker.io"
   repository: chocobozzz/peertube
   pullPolicy: IfNotPresent
   tag: "v6.3.3"
 
-# [핵심] 에러 방지를 위해 명시적 빈 리스트 선언
-imagePullSecrets: []
-
-# [핵심] 도커 시작 명령어 명시 (들여쓰기 교정됨)
-containerCommand:
-  - gosu
-  - peertube
-  - npm
-  - start
+# [에러 해결] 리스트 설정 삭제
+# imagePullSecrets: []
+# containerCommand: []
 
 serviceAccount:
   create: true
@@ -44,29 +37,24 @@ peertube:
   secret: "peertube-secret-random-12345"
   existingSecret: ""
   existingSecretKey: "secret"
-  
   admin:
     email: "admin@example.com"
-    password: "" # ArgoCD 주입
+    password: ""
     existingSecret: ""
     existingSecretKeys:
       email: "-"
       password: "-"
-
   s3:
     enabled: true
     endpoint: "s3.amazonaws.com"
-    # 더미 값 (ArgoCD에서 덮어씌움)
     streaming_playlists_bucket: "dummy"
     web_videos_bucket: "dummy"
     user_exports_bucket: "dummy"
     original_video_files_bucket: "dummy"
     access_key_id: ""
     secret_access_key: ""
-    
     upload_acl_public: "public-read"
     upload_acl_private: "private"
-    
     existingSecret: ""
     existingSecretKeys:
       endpoint: "-"
@@ -77,24 +65,23 @@ peertube:
       access_key_id: "-"
       secret_access_key: "-"
 
-  smtp:
-    host: ""
-    port: 25
-    user: ""
-    password: ""
-    tls: false
-    disable_starttls: false
-    from_address: ""
-    existingSecret: ""
-    existingSecretKeys:
-      host: "-"
-      port: "-"
-      username: "-"
-      password: "-"
+smtp:
+  host: ""
+  port: 25
+  user: ""
+  password: ""
+  tls: false
+  disable_starttls: false
+  from_address: ""
+  existingSecret: ""
+  existingSecretKeys:
+    host: "-"
+    port: "-"
+    username: "-"
+    password: "-"
 
 externalDatabase:
   enabled: true
-  # 더미 값 (ArgoCD에서 덮어씌움)
   hostname: "dummy"
   database: "peertube"
   username: "peertube"
@@ -124,31 +111,6 @@ valkey:
 
 ingress:
   enabled: false
-  className: "nginx"
-  annotations: {}
-  hosts:
-    - host: localhost
-      paths:
-        - path: /
-          pathType: Prefix
-  tls: []
 
 autoscaling:
   enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-
-# 빈 리스트 명시 (에러 방지)
-extraEnv: []
-envFrom: []
-initcontainers: {}
-podAnnotations: {}
-podLabels: {}
-podSecurityContext: {}
-securityContext: {}
-extraVolumes: []
-extraVolumeMounts: []
-tolerations: []
-affinity: {}
-nodeSelector: {}
