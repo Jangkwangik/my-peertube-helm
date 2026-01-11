@@ -163,7 +163,7 @@ spec:
             - name: PEERTUBE_OBJECT_STORAGE_ENABLED
               value: {{ .Values.peertube.s3.enabled | quote }}
             - name: PEERTUBE_OBJECT_STORAGE_ENDPOINT
-              {{- if .Values.peertube.s3.existingSecretKeys.endpoint }}
+              {{ if .Values.peertube.s3.existingSecretKeys.endpoint -}}
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.peertube.s3.existingSecret }}
@@ -172,7 +172,7 @@ spec:
               value: {{ .Values.peertube.s3.endpoint }}
               {{- end }}
             - name: PEERTUBE_OBJECT_STORAGE_STREAMING_PLAYLISTS_BUCKET_NAME
-              {{- if .Values.peertube.s3.existingSecretKeys.streaming_playlists_bucket }}
+              {{ if .Values.peertube.s3.existingSecretKeys.streaming_playlists_bucket -}}
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.peertube.s3.existingSecret }}
@@ -181,7 +181,7 @@ spec:
               value: {{ .Values.peertube.s3.streaming_playlists_bucket }}
               {{- end }}
             - name: PEERTUBE_OBJECT_STORAGE_WEB_VIDEOS_BUCKET_NAME
-              {{- if .Values.peertube.s3.existingSecretKeys.web_videos_bucket }}
+              {{ if .Values.peertube.s3.existingSecretKeys.web_videos_bucket -}}
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.peertube.s3.existingSecret }}
@@ -190,7 +190,7 @@ spec:
               value: {{ .Values.peertube.s3.web_videos_bucket }}
               {{- end }}
             - name: PEERTUBE_OBJECT_STORAGE_USER_EXPORTS_BUCKET_NAME
-              {{- if .Values.peertube.s3.existingSecretKeys.user_exports_bucket }}
+              {{ if .Values.peertube.s3.existingSecretKeys.user_exports_bucket -}}
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.peertube.s3.existingSecret }}
@@ -199,7 +199,7 @@ spec:
               value: {{ .Values.peertube.s3.user_exports_bucket }}
               {{- end }}
             - name: PEERTUBE_OBJECT_STORAGE_ORIGINAL_VIDEO_FILES_BUCKET_NAME
-              {{- if .Values.peertube.s3.existingSecretKeys.original_video_files_bucket }}
+              {{ if .Values.peertube.s3.existingSecretKeys.original_video_files_bucket -}}
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.peertube.s3.existingSecret }}
@@ -212,15 +212,23 @@ spec:
             - name: PEERTUBE_OBJECT_STORAGE_UPLOAD_ACL_PRIVATE
               value: {{ .Values.peertube.s3.upload_acl_private }}
             - name: PEERTUBE_OBJECT_STORAGE_CREDENTIALS_ACCESS_KEY_ID
+              {{ if .Values.peertube.s3.existingSecretKeys.access_key_id -}}
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.peertube.s3.existingSecret }}
                   key: {{ .Values.peertube.s3.existingSecretKeys.access_key_id }}
+              {{- else -}}
+              value: {{ .Values.peertube.s3.access_key_id }}
+              {{- end }}
             - name: PEERTUBE_OBJECT_STORAGE_CREDENTIALS_SECRET_ACCESS_KEY
+              {{ if .Values.peertube.s3.existingSecretKeys.secret_access_key -}}
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.peertube.s3.existingSecret }}
                   key: {{ .Values.peertube.s3.existingSecretKeys.secret_access_key }}
+              {{- else -}}
+              value: {{ .Values.peertube.s3.secret_access_key }}
+              {{- end }}
             {{- end }}
 
             # smtp info
