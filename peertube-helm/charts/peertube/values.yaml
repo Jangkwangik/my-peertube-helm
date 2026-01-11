@@ -1,7 +1,5 @@
-# =============================================================================
-# PeerTube 최종 안정화 버전 (문법 오류 방지)
-# =============================================================================
-
+nameOverride: ""
+fullnameOverride: ""
 replicaCount: 1
 
 image:
@@ -10,26 +8,81 @@ image:
   pullPolicy: IfNotPresent
   tag: "v6.3.3"
 
-# [에러 방지] 리스트 설정 삭제 (기본값 사용)
-# containerCommand: ... (삭제함)
+imagePullSecrets: []
 
-serviceAccount:
-  create: true
-  automount: true
-  name: "peertube-sa"
-  annotations: {}
+# [중요] 삭제했던 커맨드 설정 복구 (이게 없어서 에러가 났습니다)
+containerCommand:
+  - gosu
+  - peertube
+  - npm
+  - start
+
+extraEnv: []
+envFrom: []
+initcontainers: {}
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+securityContext: {}
+extraVolumes: []
+extraVolumeMounts: []
+tolerations: []
+affinity: {}
+nodeSelector: {}
 
 persistence:
   enabled: true
+  annotations: {}
   accessModes: ["ReadWriteOnce"]
   storageClassName: "gp2"
   storage: "10Gi"
   existingClaim: ""
 
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: peertube
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: peertube
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: "peertube-sa"
+
 service:
   enabled: true
   type: LoadBalancer
   port: 80
+
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations: {}
+  hosts:
+    - host: localhost
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
 
 peertube:
   log_level: info
@@ -54,13 +107,13 @@ peertube:
     enabled: true
     endpoint: "s3.amazonaws.com"
     
-    # [2] 버킷 이름은 여기서 직접 설정 (ArgoCD에서 빼기)
+    # [2] 버킷 이름 직접 설정 (ArgoCD에서 빼기)
     streaming_playlists_bucket: "peertube-video-20260110185235674800000001"
     web_videos_bucket: "peertube-video-20260110185235674800000001"
     user_exports_bucket: "peertube-video-20260110185235674800000001"
     original_video_files_bucket: "peertube-video-20260110185235674800000001"
     
-    # [3] 비밀 키는 ArgoCD에서 주입 (비워둠)
+    # [3] 키는 비워둠 (ArgoCD에서 주입)
     access_key_id: ""
     secret_access_key: ""
     
@@ -94,7 +147,7 @@ peertube:
 
 externalDatabase:
   enabled: true
-  # [4] DB 주소는 여기서 직접 설정 (ArgoCD에서 빼기)
+  # [4] DB 주소 직접 설정 (ArgoCD에서 빼기)
   hostname: "peertube-db.c4dqgm4aut3y.us-east-1.rds.amazonaws.com"
   database: "peertube"
   username: "peertube"
@@ -122,27 +175,3 @@ valkey:
   auth:
     password: "peertube-valkey-password"
     existingSecret: ""
-
-ingress:
-  enabled: false
-  className: "nginx"
-  annotations: {}
-  hosts:
-    - host: localhost
-      paths:
-        - path: /
-          pathType: Prefix
-  tls: []
-
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-
-# [에러 방지] 빈 리스트 명시
-extraEnv: []
-envFrom: []
-extraVolumes: []
-extraVolumeMounts: []
-imagePullSecrets: []
