@@ -8,32 +8,34 @@ image:
   pullPolicy: IfNotPresent
   tag: "v6.3.3"
 
-imagePullSecrets: []
+# [핵심 수정] 빈 리스트([]) 삭제 -> 에러 원인 제거
+# imagePullSecrets: [] 
 
-# [중요] 삭제했던 커맨드 설정 복구 (이게 없어서 에러가 났습니다)
 containerCommand:
   - gosu
   - peertube
   - npm
   - start
 
-extraEnv: []
-envFrom: []
-initcontainers: {}
-podAnnotations: {}
-podLabels: {}
-podSecurityContext: {}
-securityContext: {}
-extraVolumes: []
-extraVolumeMounts: []
-tolerations: []
-affinity: {}
-nodeSelector: {}
+# [핵심 수정] 빈 리스트([]) 및 객체({}) 전부 주석 처리
+# extraEnv: []
+# envFrom: []
+# initcontainers: {}
+# podAnnotations: {}
+# podLabels: {}
+# podSecurityContext: {}
+# securityContext: {}
+# extraVolumes: []
+# extraVolumeMounts: []
+# tolerations: []
+# affinity: {}
+# nodeSelector: {}
 
 persistence:
   enabled: true
-  annotations: {}
-  accessModes: ["ReadWriteOnce"]
+  # annotations: {}
+  accessModes:
+    - ReadWriteOnce
   storageClassName: "gp2"
   storage: "10Gi"
   existingClaim: ""
@@ -58,14 +60,11 @@ readinessProbe:
 
 autoscaling:
   enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
 
 serviceAccount:
   create: true
   automount: true
-  annotations: {}
+  # annotations: {}
   name: "peertube-sa"
 
 service:
@@ -76,7 +75,7 @@ service:
 ingress:
   enabled: false
   className: "nginx"
-  annotations: {}
+  # annotations: {}
   hosts:
     - host: localhost
       paths:
@@ -96,7 +95,7 @@ peertube:
 
   admin:
     email: "admin@example.com"
-    # [1] 관리자 비번은 ArgoCD에서 주입
+    # [1] 관리자 비번 (ArgoCD 주입)
     password: "" 
     existingSecret: ""
     existingSecretKeys:
@@ -107,13 +106,13 @@ peertube:
     enabled: true
     endpoint: "s3.amazonaws.com"
     
-    # [2] 버킷 이름 직접 설정 (ArgoCD에서 빼기)
+    # [2] 버킷 이름 직접 입력
     streaming_playlists_bucket: "peertube-video-20260110185235674800000001"
     web_videos_bucket: "peertube-video-20260110185235674800000001"
     user_exports_bucket: "peertube-video-20260110185235674800000001"
     original_video_files_bucket: "peertube-video-20260110185235674800000001"
     
-    # [3] 키는 비워둠 (ArgoCD에서 주입)
+    # [3] 키는 비워둠 (ArgoCD 주입)
     access_key_id: ""
     secret_access_key: ""
     
@@ -147,11 +146,11 @@ peertube:
 
 externalDatabase:
   enabled: true
-  # [4] DB 주소 직접 설정 (ArgoCD에서 빼기)
+  # [4] DB 주소 직접 입력
   hostname: "peertube-db.c4dqgm4aut3y.us-east-1.rds.amazonaws.com"
   database: "peertube"
   username: "peertube"
-  # [5] DB 비번은 ArgoCD에서 주입
+  # [5] DB 비번 (ArgoCD 주입)
   password: ""
   existingSecret: ""
   existingSecretKeys:
