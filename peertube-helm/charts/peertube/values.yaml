@@ -8,32 +8,29 @@ image:
   pullPolicy: IfNotPresent
   tag: "v6.3.3"
 
-# [핵심 수정] 빈 리스트([]) 삭제 -> 에러 원인 제거
-# imagePullSecrets: [] 
+# [수정] 빈 리스트([])를 명시해서 에러 방지
+imagePullSecrets: []
 
-containerCommand:
-  - gosu
-  - peertube
-  - npm
-  - start
+# [핵심 수정] 에러의 원인인 커맨드 설정을 비움 (도커 기본값 사용) ⭐
+containerCommand: []
 
-# [핵심 수정] 빈 리스트([]) 및 객체({}) 전부 주석 처리
-# extraEnv: []
-# envFrom: []
-# initcontainers: {}
-# podAnnotations: {}
-# podLabels: {}
-# podSecurityContext: {}
-# securityContext: {}
-# extraVolumes: []
-# extraVolumeMounts: []
-# tolerations: []
-# affinity: {}
-# nodeSelector: {}
+# [수정] 빈 리스트([])를 명시해서 에러 방지
+extraEnv: []
+envFrom: []
+initcontainers: {}
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+securityContext: {}
+extraVolumes: []
+extraVolumeMounts: []
+tolerations: []
+affinity: {}
+nodeSelector: {}
 
 persistence:
   enabled: true
-  # annotations: {}
+  annotations: {}
   accessModes:
     - ReadWriteOnce
   storageClassName: "gp2"
@@ -64,7 +61,7 @@ autoscaling:
 serviceAccount:
   create: true
   automount: true
-  # annotations: {}
+  annotations: {}
   name: "peertube-sa"
 
 service:
@@ -75,7 +72,7 @@ service:
 ingress:
   enabled: false
   className: "nginx"
-  # annotations: {}
+  annotations: {}
   hosts:
     - host: localhost
       paths:
