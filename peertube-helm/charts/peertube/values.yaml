@@ -255,10 +255,10 @@ externalDatabase:
   existingSecret: ""
   # keys to use in an existing Kubernetes Secret to connect to PostgreSQL
   existingSecretKeys:
-    hostname: "-"
-    database: "-"
-    username: "-"
-    password: "-"
+    hostname: ""
+    database: ""
+    username: ""
+    password: ""
 
 externalValkey:
   # -- enable external valkey/redis, if valkey.enabled=false is set
