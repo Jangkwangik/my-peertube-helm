@@ -212,32 +212,32 @@ peertube:
 
   smtp:
     # -- mail hostname
-    host: ""
+    host: "smtp.example.com"
     # -- mail port
-    port: 25
+    port: "587"
     # -- mail username
-    user: ""
+    user: "your-email@example.com"
     # -- mail password
-    password: ""
+    password: "your-real-password"
     # -- mail tls setting
-    tls: false
+    tls: true
     # -- mail disable starttls
     disable_starttls: false
     # -- email address to send emails from
-    from_address: ""
+    from_address: "no-reply@yourdomain.com"
     # -- use an existing Kubernetes Secret to connect to SMTP host
     # if set, ignores above smtp.host/port/username/password
-    existingSecret: ""
+    existingSecret: "peertube-smtp"
     # keys in an existing Kubernetes Secret to use for connecting to SMTP host
     existingSecretKeys:
       # -- key in existing secret for smtp hostname
-      host: ""
+      host: "host"
       # -- key in existing secret for smtp port
-      port: ""
+      port: "port"
       # -- key in existing secret for smtp username
-      username: ""
+      username: "username"
       # -- key in existing secret for smtp password
-      password: ""
+      password: "password"
 
 # external database credentials
 externalDatabase:
