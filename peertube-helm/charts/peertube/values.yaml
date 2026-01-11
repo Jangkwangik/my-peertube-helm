@@ -1,137 +1,130 @@
-nameOverride: ""
+# =============================================================================
+# PeerTube 최종 안정화 버전 (문법 오류 방지)
+# =============================================================================
 
-# -- full name override for all peertube resources
-fullnameOverride: ""
-
-# -- replica count if not using autoscaling
 replicaCount: 1
 
 image:
-  # -- docker registry if not using docker.io
   registry: "docker.io"
-  # -- docker repo
   repository: chocobozzz/peertube
-  # -- image pull policy, set to Always if using latest and it changes frequently
   pullPolicy: IfNotPresent
-  # -- Overrides the image tag whose default is appVersion in Chart.yaml
   tag: "v6.3.3"
 
-# -- optional image pull secrets
-imagePullSecrets: []
-
-# -- command to pass to docker container
-containerCommand:
-  - gosu
-  - peertube
-  - npm
-  - start
-
-# -- env list for deployment main container
-extraEnv: []
-
-envFrom: []
-
-# -- extra init containers for the default deployment
-initcontainers: {}
-
-# -- extra pod annotations for the deployment
-podAnnotations: {}
-
-# -- extra pod labels for the deployment
-podLabels: {}
-
-# -- pod securityContext deployment's main container
-podSecurityContext: {}
-  # fsGroup: 2000
-
-# -- securityContext whole deployment
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
-
-# -- Additional volumes on the output Deployment definition.
-extraVolumes: []
-
-# -- Additional volumeMounts on the output Deployment definition.
-extraVolumeMounts: []
-
-# -- tolerations of taints on a node
-tolerations: []
-
-# -- affinity settings for the deployment
-affinity: {}
-
-# -- node selector for deployment
-nodeSelector: {}
-
-persistence:
-  # -- enable using a persistent volume claim
-  enabled: true
-  # -- annotations to apply to the persistent volume claim
-  annotations: {}
-  # -- access mode of the persistent volume claim, e.g. ReadWriteOnce
-  accessModes:
-    - ReadWriteOnce
-  # -- storage class of the persistent volume claim
-  storageClassName: "gp2"
-  # -- size of the persistent volume claim
-  storage: "10Gi"
-  # -- use an exisitng persistent volume claim
-  existingClaim: ""
-
-# -- resources for the deployment
-resources:
-  limits:
-    cpu: 1000m
-    memory: 1Gi
-  requests:
-    cpu: 500m
-    memory: 512Mi
-
-# -- enable livenessProbe for the deployment
-livenessProbe:
-  httpGet:
-    path: /
-    port: peertube
-
-# -- enable readinessProbe for the deployment
-readinessProbe:
-  httpGet:
-    path: /
-    port: peertube
-
-autoscaling:
-  # -- enable autoscaling for the deployment
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
+# [에러 방지] 리스트 설정 삭제 (기본값 사용)
+# containerCommand: ... (삭제함)
 
 serviceAccount:
-  # -- Specifies whether a service account should be created
   create: true
-  # -- Automatically mount a ServiceAccount's API credentials?
   automount: true
-  # -- Annotations to add to the service account
-  annotations: {}
-  # -- The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
   name: "peertube-sa"
+  annotations: {}
+
+persistence:
+  enabled: true
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: "gp2"
+  storage: "10Gi"
+  existingClaim: ""
 
 service:
   enabled: true
   type: LoadBalancer
   port: 80
 
-ingress:
-  # -- enable ingress from outside the cluster to this peertube instance
+peertube:
+  log_level: info
+  trust_proxy: '10.0.0.0/8'
+  webserver_hostname: localhost
+  webserver_port: 80
+  webserver_https: false
+  secret: "peertube-secret-random-12345"
+  existingSecret: ""
+  existingSecretKey: "secret"
+
+  admin:
+    email: "admin@example.com"
+    # [1] 관리자 비번은 ArgoCD에서 주입
+    password: "" 
+    existingSecret: ""
+    existingSecretKeys:
+      email: "-"
+      password: "-"
+
+  s3:
+    enabled: true
+    endpoint: "s3.amazonaws.com"
+    
+    # [2] 버킷 이름은 여기서 직접 설정 (ArgoCD에서 빼기)
+    streaming_playlists_bucket: "peertube-video-20260110185235674800000001"
+    web_videos_bucket: "peertube-video-20260110185235674800000001"
+    user_exports_bucket: "peertube-video-20260110185235674800000001"
+    original_video_files_bucket: "peertube-video-20260110185235674800000001"
+    
+    # [3] 비밀 키는 ArgoCD에서 주입 (비워둠)
+    access_key_id: ""
+    secret_access_key: ""
+    
+    upload_acl_public: "public-read"
+    upload_acl_private: "private"
+    
+    existingSecret: ""
+    existingSecretKeys:
+      endpoint: "-"
+      streaming_playlists_bucket: "-"
+      web_videos_bucket: "-"
+      user_exports_bucket: "-"
+      original_video_files_bucket: "-"
+      access_key_id: "-"
+      secret_access_key: "-"
+
+  smtp:
+    host: ""
+    port: 25
+    user: ""
+    password: ""
+    tls: false
+    disable_starttls: false
+    from_address: ""
+    existingSecret: ""
+    existingSecretKeys:
+      host: "-"
+      port: "-"
+      username: "-"
+      password: "-"
+
+externalDatabase:
+  enabled: true
+  # [4] DB 주소는 여기서 직접 설정 (ArgoCD에서 빼기)
+  hostname: "peertube-db.c4dqgm4aut3y.us-east-1.rds.amazonaws.com"
+  database: "peertube"
+  username: "peertube"
+  # [5] DB 비번은 ArgoCD에서 주입
+  password: ""
+  existingSecret: ""
+  existingSecretKeys:
+    hostname: "-"
+    database: "-"
+    username: "-"
+    password: "-"
+
+externalValkey:
   enabled: false
-  # -- ingress controller class name
+  hostname: ""
+  password: ""
+  existingSecret: ""
+  existingSecretKey: valkey-password
+
+postgresql:
+  enabled: false
+
+valkey:
+  enabled: true
+  auth:
+    password: "peertube-valkey-password"
+    existingSecret: ""
+
+ingress:
+  enabled: false
   className: "nginx"
   annotations: {}
   hosts:
@@ -141,167 +134,15 @@ ingress:
           pathType: Prefix
   tls: []
 
-peertube:
-  # -- set peertube's logging level
-  log_level: info
-  # -- set peertube's trusted proxies
-  trust_proxy: '10.0.0.0/8'
-  # -- set peertube's hostname
-  webserver_hostname: localhost
-  # -- set peertube's port
-  webserver_port: 80
-  # -- enable https for peertube web frontend
-  webserver_https: false
-  # -- set peertube's secret
-  secret: "peertube-secret-random-12345"
-  # -- use an existing Kubernetes Secret for Peertube's secret
-  existingSecret: ""
-  # -- a key in an existing Kubernetes Secret for Peertube's secret
-  existingSecretKey: "secret"
-
-  # parameters for creating an initial admin password
-  admin:
-    # -- email address of peertube admin user
-    email: "admin@example.com"
-    # -- initial peertube of peertube admin password
-    password: "원하는_관리자_비밀번호"
-    # -- use an existing Kubernetes Secret for Peertube's admin credentials
-    existingSecret: ""
-    existingSecretKeys:
-      # -- a key in an existing Kubernetes Secret for Peertube's admin user email
-      email: "-"
-      # -- a key in an existing Kubernetes Secret for Peertube's admin password
-      password: "-"
-
-  s3:
-    # -- enable object storage, s3, for peertube
-    enabled: true
-    # -- s3 endpoint to connect to for peertube storage
-    endpoint: "s3.amazonaws.com"
-    # -- s3 bucket for peertube to store streaming playlists
-    streaming_playlists_bucket: "사용자님의_S3_버킷명"
-    # -- s3 bucket for peertube to store web videos
-    web_videos_bucket: "사용자님의_S3_버킷명"
-    # -- s3 bucket for peertube to store user exports
-    user_exports_bucket: "사용자님의_S3_버킷명"
-    # -- s3 bucket for peertube to store original video files
-    original_video_files_bucket: "사용자님의_S3_버킷명"
-    # -- access key id for connecting to s3
-    access_key_id: "S3_액세스 키 (ID) 확인"
-    # -- secret access key id for connecting to s3
-    secret_access_key: "S3_시크릿 키 (비밀번호) 확인"
-    upload_acl_public: "public-read"
-    upload_acl_private: "private"
-    # -- get the credentials for s3 from an existing Kubernetes Secret
-    existingSecret: ""
-    existingSecretKeys:
-      # -- key in existing secret for s3 endpoint
-      endpoint: "-"
-      # -- key in existing secret for s3 bucket for streaming playlists
-      streaming_playlists_bucket: "-"
-      # -- key in existing secret for s3 bucket for web videos
-      web_videos_bucket: "-"
-      # -- key in existing secret for s3 bucket for user exports
-      user_exports_bucket: "-"
-      # -- key in existing secret for s3 bucket for original video files
-      original_video_files_bucket: "-"
-      # -- key in existing secret for s3 access_key_id
-      access_key_id: "-"
-      # -- key in existing secret for s3 secret_access_key
-      secret_access_key: "-"
-
-  smtp:
-    # -- mail hostname
-    host: ""
-    # -- mail port
-    port: 25
-    # -- mail username
-    user: ""
-    # -- mail password
-    password: ""
-    # -- mail tls setting
-    tls: false
-    # -- mail disable starttls
-    disable_starttls: false
-    # -- email address to send emails from
-    from_address: ""
-    # -- use an existing Kubernetes Secret to connect to SMTP host
-    # if set, ignores above smtp.host/port/username/password
-    existingSecret: ""
-    # keys in an existing Kubernetes Secret to use for connecting to SMTP host
-    existingSecretKeys:
-      # -- key in existing secret for smtp hostname
-      host: "-"
-      # -- key in existing secret for smtp port
-      port: "-"
-      # -- key in existing secret for smtp username
-      username: "-"
-      # -- key in existing secret for smtp password
-      password: "-"
-
-# external database credentials
-externalDatabase:
-  # -- enable external database, if postgresql.enabled=false is set
-  enabled: true
-  # -- postgresql hostname
-  hostname: "사용자님의_RDS_ENDPOINT"
-  # -- postgresql database name
-  database: "peertube"
-  # -- postgresql username
-  username: "peertube"
-  # -- postgresql password
-  password: "사용자님의_RDS_PASSWORD"
-  # -- use an existing Kubernetes Secret to connect to PostgreSQL
-  existingSecret: ""
-  # keys to use in an existing Kubernetes Secret to connect to PostgreSQL
-  existingSecretKeys:
-    hostname: "-"
-    database: "-"
-    username: "-"
-    password: "-"
-
-externalValkey:
-  # -- enable external valkey/redis, if valkey.enabled=false is set
+autoscaling:
   enabled: false
-  # -- hostname of external valkey/redis
-  hostname: ""
-  # -- valkey/redis password
-  password: ""
-  # -- use an existing Kubernetes Secret to connect to Redis/Valkey
-  existingSecret: ""
-  # -- key to use in an existing Kubernetes Secret to connect to Redis/Valkey
-  existingSecretKey: valkey-password
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
 
-# optionally use the bundled Bitnami PostgreSQL subchart
-# https://github.com/bitnami/charts/tree/main/bitnami/postgresql#parameters
-postgresql:
-  # -- if externalDatabase.enabled is true, postgresql.enabled must be false
-  enabled: false
-  auth:
-    database: peertube_production
-    username: peertube
-    # you must set a password; the password generated by the postgresql chart will
-    # be rotated on each upgrade:
-    # https://github.com/bitnami/charts/tree/main/bitnami/postgresql#upgrade
-    password: ""
-    # Set the password for the "postgres" admin user
-    # set this to the same value as above if you've previously installed
-    # this chart and you're having problems getting peertube to connect to the DB
-    # postgresPassword: ""
-    # you can also specify the name of an existing Secret
-    # with a key of password set to the password you want
-    existingSecret: ""
-
-# optionally use the bundled Bitnami Valkey subchart
-# https://github.com/bitnami/charts/tree/main/bitnami/valkey
-valkey:
-  # -- enable the valkey (alternative to redis) subchart
-  enabled: true
-  auth:
-    # -- you must set a password; the password generated by the valkey chart will be
-    # rotated on each upgrade:
-    password: "peertube-valkey-password"
-    # -- you can also specify the name of an existing Secret
-    existingSecret: ""
-    # -- key of password in existing secret
-    existingSecretPasswordKey: ""
+# [에러 방지] 빈 리스트 명시
+extraEnv: []
+envFrom: []
+extraVolumes: []
+extraVolumeMounts: []
+imagePullSecrets: []
